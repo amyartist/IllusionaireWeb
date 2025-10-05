@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "IllusionaireApp"
+rootProject.name = "IllusionaireWeb"
 include(":app")

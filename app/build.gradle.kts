@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.amyartist.illusionaireapp"
+    namespace = "com.amyartist.illusionaireweb"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.amyartist.illusionaireapp"
+        applicationId = "com.amyartist.illusionaireweb"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
