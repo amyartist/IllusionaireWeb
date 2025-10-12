@@ -32,6 +32,7 @@ fun showGameScreen(containerId: String) {
         // Main Game Container
         val gameContainer = document.createElement("div") as HTMLDivElement
         with(gameContainer.style) {
+            position = "relative"
             maxWidth = "1024px"
             maxHeight = "1126.4px" // 1024px * 1.1
             width = "min(100%, 100vw, 90vh * (1 / 1.1))"
@@ -50,13 +51,14 @@ fun showGameScreen(containerId: String) {
 
         // Add the image to the game container
         gameContainer.appendChild(roomImage)
+        // Health Bar
+        val healthBar = createHealthBarElement()
+        gameContainer.appendChild(healthBar)
 
         // --- State Observation ---
         viewModel.gameState.onEach { state ->
             roomImage.src = state.currentRoom.image
-
-            console.log("UI updated for room: ${state.currentRoom.name}")
-
+            updateHealthBar(healthBar, state.playerHealth)
         }.launchIn(scope)
 
 

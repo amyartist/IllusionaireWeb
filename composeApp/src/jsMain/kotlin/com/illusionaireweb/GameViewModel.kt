@@ -36,6 +36,10 @@ class GameViewModel {
         }
     }
 
-    // You can add more functions here later to handle other game actions,
-    // like opening a chest, fighting a monster, etc.
+    fun takeDamage(amount: Int) {
+        _gameState.update { currentState ->
+            val newHealth = currentState.playerHealth - amount
+            currentState.copy(playerHealth = newHealth)
+        }
+    }
 }
