@@ -1,9 +1,13 @@
 package com.illusionaireweb
 
 import kotlinx.browser.document
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.Text
+import org.w3c.dom.HTMLImageElement
 
 /**
  * Injects the game screen into a specified container element on the page.
@@ -14,6 +18,11 @@ fun showGameScreen(containerId: String) {
     val hostContainer = document.getElementById(containerId) as? HTMLElement
 
     if (hostContainer != null) {
+        // --- ViewModel and State Management ---
+        val viewModel = GameViewModel()
+        val scope = CoroutineScope(Dispatchers.Main)
+
+        // --- UI Setup ---
         hostContainer.style.display = "flex"
         hostContainer.style.alignItems = "center"
         hostContainer.style.justifyContent = "center"
@@ -31,10 +40,24 @@ fun showGameScreen(containerId: String) {
             backgroundColor = "black"
         }
 
-        val textNode: Text = document.createTextNode("Hello, world!")
-        gameContainer.appendChild(textNode)
+        // Create the image element for the room background
+        val roomImage = document.createElement("img") as HTMLImageElement
+        with(roomImage.style) {
+            width = "100%"
+            height = "auto" // Maintain aspect ratio
+            objectFit = "cover"
+        }
 
+        // Add the image to the game container
+        gameContainer.appendChild(roomImage)
 
+        // --- State Observation ---
+        viewModel.gameState.onEach { state ->
+            roomImage.src = state.currentRoom.image
+
+            console.log("UI updated for room: ${state.currentRoom.name}")
+
+        }.launchIn(scope)
 
 
         hostContainer.innerHTML = ""

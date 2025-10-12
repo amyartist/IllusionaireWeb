@@ -36,7 +36,7 @@ data class Action(
 data class Room(
     val id: String,
     val name: String,
-    val prompt: String,
+    val image: String,
     val exits: Map<String, String>,
     val actions: List<Action>
 )
@@ -45,7 +45,7 @@ val gameRooms = mapOf(
     "starting_room" to Room(
         id = "starting_room",
         name = "Starting Room",
-        prompt = "Generate an image of a dimly lit entryway of a old mansion. The decor is generally dark wood with dusty bronze fixtures and details. The year is 1850. There is a door to the north and a chest decorated with jewels in the corner. There is only one door visible in the room. Use an anime cartoon background style of art.",
+        image = "images/starting_room.jpg",
         exits = mapOf("north" to "hallway"),
         actions = listOf(
             Action(
@@ -73,7 +73,7 @@ val gameRooms = mapOf(
     "hallway" to Room(
         id = "hallway",
         name = "Hallway",
-        prompt = "Generate an image of a dimly lit, long hallway. There are paintings on the walls. There are gothic style windows but it is very dark outside. The year is 1850. There is an old door at the far end of the hallway. it is the only door visible in the hallway. The decor is generally dark wood with dusty bronze fixtures and details. Use an anime cartoon background style of art.",
+        image = "images/hallway.jpg",
         exits = mapOf("south" to "starting_room", "north" to "library"),
         actions = listOf(
             Action(
@@ -110,7 +110,7 @@ val gameRooms = mapOf(
     "library" to Room(
         id = "library",
         name = "Library",
-        prompt = "Generate an image of an old library with a high ceiling. There are tall shelves full of old books. The room is lit with candle fixtures on the wall. There is a creepy painting of an old man dressed in a smoker's jacket on the left side of the room. It is nighttime. The decor is generally dark wood with dusty bronze fixtures and details. Use an anime cartoon background style of art.",
+        image = "images/library.jpg",
         exits = mapOf("south" to "hallway"),
         actions = listOf(
             Action(
