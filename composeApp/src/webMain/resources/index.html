@@ -3,10 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IllusionaireWeb</title>
-    <link type="text/css" rel="stylesheet" href="styles.css">
-    <script type="application/javascript" src="composeApp.js"></script>
+    <title>My Existing Website</title>
+<!--    <style>-->
+<!--        /* Basic styling for the host page */-->
+<!--        body { font-family: sans-serif; line-height: 1.6; }-->
+<!--        header, footer { text-align: center; padding: 20px; background-color: #f4f4f4; }-->
+<!--        .content { padding: 20px; max-width: 900px; margin: 0 auto; }-->
+
+<!--        /* Give the container a specific size, for example */-->
+<!--        #game-section {-->
+<!--            height: 70vh; /* Make the game section 70% of the viewport height */-->
+<!--            background-color: #222;-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--    </style>-->
 </head>
 <body>
+
+<header>
+    <h1>Welcome to My Website</h1>
+</header>
+
+<div class="content">
+    <h2>About My Site</h2>
+    <p>Here is some content on my page. Below, I want to embed my special Kotlin/JS application.</p>
+</div>
+
+<!-- Section that will contain the game -->
+<section id="game-section">
+    <!-- This is the target div your Kotlin code will find -->
+    <div id="illusionaire-web-container">
+        <!-- You can have fallback content here -->
+        <p style="color: white;">Loading game...</p>
+    </div>
+</section>
+
+<div class="content">
+    <h2>More Content</h2>
+    <p>Here is more content after the embedded application.</p>
+</div>
+
+<footer>
+    <p>&copy; 2025 My Website</p>
+</footer>
+
+<!--
+  Include your compiled Kotlin/JS file here.
+  The name and path depend on your build configuration (e.g., build/dist/js/productionExecutable/IllusionaireWeb.js)
+-->
+<script src="IllusionaireWeb.js"></script>
+
 </body>
 </html>

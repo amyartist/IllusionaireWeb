@@ -1,5 +1,4 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,7 +10,33 @@ kotlin {
 
     js(IR) {
         browser {
-            binaries.executable()
+            commonWebpackConfig {
+                outputFileName = "IllusionaireWeb.js"
+            }
+            // Use the 'webpack' variant for more detailed configuration
+            webpackTask {
+                mainOutputFileName = "IllusionaireWeb.js"
+            }
+            runTask {
+                // Define the path to your resources folder
+                val resourcesPath = project.file("src/webMain/resources")
+
+                // Simple check to see if the directory exists, to help with debugging.
+                if (!resourcesPath.exists()) {
+                    // This will print a helpful error during the Gradle sync/build if the path is wrong.
+                    project.logger.warn("Warning: The 'jsMain/resources' directory does not exist. The dev server may not find index.html.")
+                }
+
+                // Configure the development server using the recommended property
+                devServerProperty.set(
+                    KotlinWebpackConfig.DevServer(
+                        // The 'static' property takes a list of directories to serve files from.
+                        // The server will automatically look for 'index.html' within these directories.
+                        static = mutableListOf(resourcesPath.absolutePath)
+                    )
+                )
+            }
+        binaries.executable()
         }
     }
 

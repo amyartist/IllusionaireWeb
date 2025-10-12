@@ -1,13 +1,17 @@
+// main.kt
 package com.illusionaireweb
 
 import kotlinx.browser.document
 
 /**
- * The main entry point for the web application.
- * This function will be executed when the JavaScript file is loaded in the browser.
+ * Main entry point. This function looks for a container on the host page
+ * and injects the game into it.
  */
 fun main() {
     document.addEventListener("DOMContentLoaded", {
-        showGameScreen()
+        // The ID of the div on the host website where the game will be embedded.
+        val gameContainerId = "illusionaire-web-container"
+
+        showGameScreen(gameContainerId)
     })
 }
