@@ -102,6 +102,31 @@ class GameViewModel {
         }
     }
 
+    private fun hideCurrentMonster() {
+        _gameState.update { currentState ->
+            val monsterActionIdToRemove = currentState.currentRoom.actions.find {
+                it.id in currentState.revealedMonsterActionIds && it.monster != null
+            }?.id
+
+            if (monsterActionIdToRemove != null) {
+                val newRevealedIds = currentState.revealedMonsterActionIds - monsterActionIdToRemove
+                currentState.copy(revealedMonsterActionIds = newRevealedIds)
+            } else {
+                currentState
+            }
+        }
+    }
+
+    fun onFightMonster() {
+        console.log("Player chose to FIGHT!")
+        hideCurrentMonster()
+    }
+
+    fun onAppeaseMonster() {
+        console.log("Player chose to APPEASE!")
+        hideCurrentMonster()
+    }
+
     fun dismissDialog() {
         _gameState.update { it.copy(dialogMessage = null) }
     }

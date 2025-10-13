@@ -71,7 +71,10 @@ fun showGameScreen(containerId: String) {
         val avatarDisplay = createAvatarElement()
         gameContainer.appendChild(avatarDisplay)
 
-        val monsterDisplay = createMonsterDisplayElement()
+        val monsterDisplay = createMonsterDisplayElement(
+            onFightClick = { viewModel.onFightMonster() },
+            onAppeaseClick = { viewModel.onAppeaseMonster() }
+        )
         gameContainer.appendChild(monsterDisplay)
 
         val buttonsContainer = createButtonsContainer()
@@ -88,11 +91,19 @@ fun showGameScreen(containerId: String) {
             updateHealthBar(healthBar, state.playerHealth)
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
             updateAvatarDisplay(avatarDisplay, state.currentAvatar)
+            updateDialog(dialog, state.dialogMessage)
+            val isMonsterVisible = state.currentRoom.actions.any {
+                it.id in state.revealedMonsterActionIds && it.monster != null
+            }
             updateMonsterDisplay(monsterDisplay, state.currentRoom, state.revealedMonsterActionIds)
+            if (isMonsterVisible) {
+                buttonsContainer.style.display = "none"
+            } else {
+                buttonsContainer.style.display = "flex"
+            }
             updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
                 viewModel.onPlayerAction(actionId)
             }
-            updateDialog(dialog, state.dialogMessage)
         }.launchIn(scope)
 
 

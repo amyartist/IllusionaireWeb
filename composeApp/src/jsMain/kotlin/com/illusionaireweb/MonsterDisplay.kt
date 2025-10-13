@@ -1,37 +1,43 @@
 package com.illusionaireweb
 
 import kotlinx.browser.document
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLImageElement
 import kotlin.text.endsWith
 
 /**
- * Creates the container element for displaying a monster. It is hidden by default.
+ * Creates the container element for displaying a monster, now with action buttons.
  *
- * @return A HTMLDivElement that will hold the monster image.
+ * @param onFightClick Lambda to execute when the "Fight!" button is clicked.
+ * @param onAppeaseClick Lambda to execute when the "Appease" button is clicked.
+ * @return A HTMLDivElement that will hold the monster image and buttons.
  */
-fun createMonsterDisplayElement(): HTMLDivElement {
+fun createMonsterDisplayElement(
+    onFightClick: () -> Unit,
+    onAppeaseClick: () -> Unit
+): HTMLDivElement {
     val monsterContainer = document.createElement("div") as HTMLDivElement
     monsterContainer.id = "monster-container"
 
     with(monsterContainer.style) {
         position = "absolute"
         top = "50%"
-        right = "50%"
-        transform = "translate(50%, -50%)"
-        backgroundColor = "transparent"
+        left = "50%"
+        transform = "translate(-50%, -50%)"
+        backgroundColor = "transparent" // The container itself is invisible
         width = "300px"
 
-        // Flexbox to center the image inside
         display = "flex"
         flexDirection = "column"
         alignItems = "center"
+        columnGap = "15px" // Add some space between the image and the buttons
 
-        // Initially hidden
         display = "none"
         zIndex = "10"
     }
 
+    // Monster Image
     val monsterImage = document.createElement("img") as HTMLImageElement
     monsterImage.id = "monster-image"
     with(monsterImage.style) {
@@ -39,7 +45,50 @@ fun createMonsterDisplayElement(): HTMLDivElement {
         height = "auto"
     }
 
+    // Container for the buttons
+    val buttonContainer = document.createElement("div") as HTMLDivElement
+    with(buttonContainer.style) {
+        display = "flex"
+        justifyContent = "center"
+        columnGap = "10px"
+    }
+
+    // Create Fight and Appease buttons
+    val buttonStyle: HTMLButtonElement.() -> Unit = {
+        with(style) {
+            backgroundImage = "url('images/button1.png')"
+            backgroundSize = "cover"
+            backgroundPosition = "center"
+            width = "150px"
+            height = "50px"
+            border = "none"
+            backgroundColor = "transparent"
+            color = GameColors.BUTTON_TEXT_GOLD
+            fontSize = "16px"
+            fontWeight = "bold"
+            cursor = "pointer"
+        }
+    }
+
+    val fightButton = (document.createElement("button") as HTMLButtonElement).apply {
+        textContent = "Fight!"
+        buttonStyle()
+        onclick = { onFightClick() }
+    }
+
+    val appeaseButton = (document.createElement("button") as HTMLButtonElement).apply {
+        textContent = "Appease"
+        buttonStyle()
+        onclick = { onAppeaseClick() }
+    }
+
+    // Assemble the parts
+    buttonContainer.appendChild(fightButton)
+    buttonContainer.appendChild(appeaseButton)
+
     monsterContainer.appendChild(monsterImage)
+    monsterContainer.appendChild(buttonContainer) // Add the button container below the image
+
     return monsterContainer
 }
 
