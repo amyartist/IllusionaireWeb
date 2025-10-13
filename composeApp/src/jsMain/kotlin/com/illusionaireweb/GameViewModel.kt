@@ -119,6 +119,26 @@ class GameViewModel {
 
     fun onFightMonster() {
         console.log("Player chose to FIGHT!")
+        _gameState.update { currentState ->
+            val monsterAction = currentState.currentRoom.actions.find {
+                it.id in currentState.revealedMonsterActionIds && it.monster != null
+            }
+
+            if (monsterAction?.monster == null) {
+                console.error("onFightMonster called, but no active monster was found in the state.")
+                return@update currentState
+            }
+
+            val monster = monsterAction.monster
+            val weapon = currentState.equippedWeapon
+            val damageTaken = (monster.strength - weapon.strength).coerceAtLeast(0)
+            val newHealth = (currentState.playerHealth - damageTaken).coerceAtLeast(0)
+            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
+            currentState.copy(
+                playerHealth = newHealth,
+                revealedMonsterActionIds = newRevealedIds
+            )
+        }
         hideCurrentMonster()
     }
 
