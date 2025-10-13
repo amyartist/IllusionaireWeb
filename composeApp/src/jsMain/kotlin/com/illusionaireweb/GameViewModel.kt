@@ -18,13 +18,52 @@ class GameViewModel {
         )
     )
 
-    // A public, read-only flow that the UI can observe for changes.
     val gameState = _gameState.asStateFlow()
 
+
     /**
-     * Moves the player to a new room.
-     * @param roomId The ID of the destination room.
+     * Main entry point for all player actions from buttons.
+     * It finds the action by its ID and delegates to the appropriate handler.
      */
+    fun onPlayerAction(actionId: String) {
+        // Find the room and the specific action that was clicked
+        val currentRoom = _gameState.value.currentRoom
+        val action = currentRoom.actions.find { it.id == actionId }
+
+        if (action == null) {
+            console.error("Action with ID '$actionId' not found in room '${currentRoom.id}'.")
+            return
+        }
+
+        // Delegate to the correct function based on the action type
+        when (action.type) {
+            ActionType.LOOK -> handleLookAction(action)
+            ActionType.OPEN -> handleOpenAction(action)
+            ActionType.GO -> handleGoAction(action)
+        }
+    }
+
+    private fun handleLookAction(action: Action) {
+        console.log("Executing LOOK action: ${action.id}")
+        // Future logic: display action.message in a text box, update avatar.
+        _gameState.update { it.copy(currentAvatar = action.avatar ?: it.currentAvatar) }
+    }
+
+    private fun handleOpenAction(action: Action) {
+        console.log("Executing OPEN action: ${action.id}")
+        // Future logic: check inventory, maybe trigger a monster, give an item.
+        _gameState.update { it.copy(currentAvatar = action.avatar ?: it.currentAvatar) }
+    }
+
+    private fun handleGoAction(action: Action) {
+        console.log("Executing GO action: ${action.id}")
+        // Future logic: move the player to a new room.
+        val destinationId = action.destinationRoomId
+        if (destinationId != null) {
+            moveToRoom(destinationId)
+        }
+    }
+
     fun moveToRoom(roomId: String) {
         val newRoom = gameRooms[roomId]
         if (newRoom != null) {

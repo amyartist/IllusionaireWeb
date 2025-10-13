@@ -34,9 +34,11 @@ fun showGameScreen(containerId: String) {
         with(gameContainer.style) {
             position = "relative"
             maxWidth = "1024px"
-            maxHeight = "1126.4px" // 1024px * 1.1
-            width = "min(100%, 100vw, 90vh * (1 / 1.1))"
-            setProperty("aspect-ratio", "1 / 1.1")
+            maxHeight = "1024px"
+//            maxHeight = "1126.4px" // 1024px * 1.1
+//            width = "min(100%, 100vw, 90vh * (1 / 1.1))"
+            width = "min(100%, 100vw, 90vh)"
+//            setProperty("aspect-ratio", "1 / 1.1")
             border = "2px solid yellow"
             backgroundColor = "black"
         }
@@ -45,7 +47,7 @@ fun showGameScreen(containerId: String) {
         val roomImage = document.createElement("img") as HTMLImageElement
         with(roomImage.style) {
             width = "100%"
-            height = "auto" // Maintain aspect ratio
+            height = "auto"
             objectFit = "cover"
         }
 
@@ -60,11 +62,18 @@ fun showGameScreen(containerId: String) {
         val avatarDisplay = createAvatarElement()
         gameContainer.appendChild(avatarDisplay)
 
+        // Create the buttons container and add it to the game area
+        val buttonsContainer = createButtonsContainer()
+        gameContainer.appendChild(buttonsContainer)
+
         // --- State Observation ---
         viewModel.gameState.onEach { state ->
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
             updateAvatarDisplay(avatarDisplay, state.currentAvatar) // Update the avatar's image
+            updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
+                viewModel.onPlayerAction(actionId)
+            }
         }.launchIn(scope)
 
 
