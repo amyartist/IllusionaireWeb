@@ -34,13 +34,13 @@ fun showGameScreen(containerId: String) {
         with(gameContainer.style) {
             position = "relative"
             maxWidth = "1024px"
-            maxHeight = "1024px"
-//            maxHeight = "1126.4px" // 1024px * 1.1
-//            width = "min(100%, 100vw, 90vh * (1 / 1.1))"
             width = "min(100%, 100vw, 90vh)"
-//            setProperty("aspect-ratio", "1 / 1.1")
-            border = "2px solid yellow"
-            backgroundColor = "black"
+            border = "2px solid ${GameColors.BORDER_YELLOW}"
+            backgroundColor = GameColors.BACKGROUND_BLACK
+            borderRadius = "10px"
+            display = "flex"
+            alignItems = "center"      // Vertically center the content
+            justifyContent = "center"
         }
 
         // Create the image element for the room background
@@ -48,7 +48,7 @@ fun showGameScreen(containerId: String) {
         with(roomImage.style) {
             width = "100%"
             height = "auto"
-            objectFit = "cover"
+            borderRadius = "10px"
         }
 
         // Add the image to the game container

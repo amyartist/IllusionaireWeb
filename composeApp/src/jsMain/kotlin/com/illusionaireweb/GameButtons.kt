@@ -59,7 +59,7 @@ fun updateGameButtons(container: HTMLDivElement, actions: List<Action>, onAction
             backgroundColor = "transparent"
 
             // Text styling
-            color = "#5a4104"
+            color = GameColors.BUTTON_TEXT_GOLD
             fontSize = "16px"
             fontWeight = "bold"
             fontFamily = "serif"
