@@ -62,6 +62,15 @@ class GameViewModel {
                 )
             }
 
+            if (action.monster != null) {
+                val newRevealedIds = currentState.revealedMonsterActionIds + action.id
+                return@update currentState.copy(
+                    dialogMessage = action.message,
+                    currentAvatar = action.avatar ?: currentState.currentAvatar,
+                    revealedMonsterActionIds = newRevealedIds
+                )
+            }
+
             val foundItems = action.contents
             if (foundItems.isNullOrEmpty()) {
                 val newLootedIds = currentState.lootedActionIds + action.id

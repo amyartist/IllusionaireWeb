@@ -6,5 +6,6 @@ data class GameState(
     val currentAvatar: Avatar,
     val playerHealth: Int = 100,
     val dialogMessage: String? = null,
-    val lootedActionIds: Set<String> = emptySet()
+    val lootedActionIds: Set<String> = emptySet(),
+    val revealedMonsterActionIds: Set<String> = emptySet()
 )

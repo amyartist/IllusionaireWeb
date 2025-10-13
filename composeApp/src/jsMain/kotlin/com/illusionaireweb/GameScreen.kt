@@ -71,6 +71,9 @@ fun showGameScreen(containerId: String) {
         val avatarDisplay = createAvatarElement()
         gameContainer.appendChild(avatarDisplay)
 
+        val monsterDisplay = createMonsterDisplayElement()
+        gameContainer.appendChild(monsterDisplay)
+
         val buttonsContainer = createButtonsContainer()
         gameContainer.appendChild(buttonsContainer)
 
@@ -84,7 +87,8 @@ fun showGameScreen(containerId: String) {
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
-            updateAvatarDisplay(avatarDisplay, state.currentAvatar) // Update the avatar's image
+            updateAvatarDisplay(avatarDisplay, state.currentAvatar)
+            updateMonsterDisplay(monsterDisplay, state.currentRoom, state.revealedMonsterActionIds)
             updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
                 viewModel.onPlayerAction(actionId)
             }
