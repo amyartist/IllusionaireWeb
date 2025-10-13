@@ -4,19 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Existing Website</title>
-<!--    <style>-->
-<!--        /* Basic styling for the host page */-->
-<!--        body { font-family: sans-serif; line-height: 1.6; }-->
-<!--        header, footer { text-align: center; padding: 20px; background-color: #f4f4f4; }-->
-<!--        .content { padding: 20px; max-width: 900px; margin: 0 auto; }-->
+    <style>
+        /* Basic styling for the host page */
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            background-color: black; /* Set the entire page background to black */
+            color: white;             /* Set the default text color to white */
+            margin: 0;                /* Remove default body margin */
+            padding: 0;               /* Remove default body padding */
+        }
+        header, footer {
+            text-align: center;
+            padding: 20px;
+            /* A slightly lighter shade for header/footer for contrast */
+            background-color: #1a1a1a;
+        }
+        .content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto; /* Add margin to space it out vertically */
+        }
 
-<!--        /* Give the container a specific size, for example */-->
-<!--        #game-section {-->
-<!--            height: 70vh; /* Make the game section 70% of the viewport height */-->
-<!--            background-color: #222;-->
-<!--            padding: 20px;-->
-<!--        }-->
-<!--    </style>-->
+        /* Give the game container a specific size and remove its own background */
+        #game-section {
+            padding: 20px;
+            /* The black background is now handled by the body, so this can be transparent */
+            background-color: transparent;
+        }
+    </style>
 </head>
 <body>
 
