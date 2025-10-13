@@ -14,6 +14,11 @@ object GameColors {
     // --- Button Colors ---
     const val BUTTON_TEXT_GOLD = "#5a4104"
 
+    // --- Dialog Colors ---
+    const val DIALOG_BACKGROUND = "#5a4104"
+    const val DIALOG_TEXT = "white"
+
+
     // --- Health Bar Colors ---
     const val HEALTH_BAR_FILL = "green"
     const val HEALTH_BAR_BACKGROUND = "#333"

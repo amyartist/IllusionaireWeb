@@ -39,32 +39,31 @@ fun showGameScreen(containerId: String) {
             backgroundColor = GameColors.BACKGROUND_BLACK
             borderRadius = "10px"
             display = "flex"
-            alignItems = "center"      // Vertically center the content
+            alignItems = "center"
             justifyContent = "center"
         }
 
-        // Create the image element for the room background
         val roomImage = document.createElement("img") as HTMLImageElement
         with(roomImage.style) {
             width = "100%"
             height = "auto"
             borderRadius = "10px"
         }
-
-        // Add the image to the game container
         gameContainer.appendChild(roomImage)
 
-        // Health Bar
         val healthBar = createHealthBarElement()
         gameContainer.appendChild(healthBar)
 
-        // Avatar Display
         val avatarDisplay = createAvatarElement()
         gameContainer.appendChild(avatarDisplay)
 
-        // Create the buttons container and add it to the game area
         val buttonsContainer = createButtonsContainer()
         gameContainer.appendChild(buttonsContainer)
+
+        val dialog = createDialogElement {
+            viewModel.dismissDialog()
+        }
+        gameContainer.appendChild(dialog)
 
         // --- State Observation ---
         viewModel.gameState.onEach { state ->
@@ -74,6 +73,7 @@ fun showGameScreen(containerId: String) {
             updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
                 viewModel.onPlayerAction(actionId)
             }
+            updateDialog(dialog, state.dialogMessage)
         }.launchIn(scope)
 
 

@@ -4,5 +4,6 @@ data class GameState(
     val currentRoom: Room,
     val equippedWeapon: Weapon,
     val currentAvatar: Avatar,
-    val playerHealth: Int = 100
+    val playerHealth: Int = 100,
+    val dialogMessage: String? = null
 )

@@ -45,8 +45,12 @@ class GameViewModel {
 
     private fun handleLookAction(action: Action) {
         console.log("Executing LOOK action: ${action.id}")
-        // Future logic: display action.message in a text box, update avatar.
-        _gameState.update { it.copy(currentAvatar = action.avatar ?: it.currentAvatar) }
+        _gameState.update {
+            it.copy(
+                dialogMessage = action.message,
+                currentAvatar = action.avatar ?: it.currentAvatar
+            )
+        }
     }
 
     private fun handleOpenAction(action: Action) {
@@ -62,6 +66,10 @@ class GameViewModel {
         if (destinationId != null) {
             moveToRoom(destinationId)
         }
+    }
+
+    fun dismissDialog() {
+        _gameState.update { it.copy(dialogMessage = null) }
     }
 
     fun moveToRoom(roomId: String) {
