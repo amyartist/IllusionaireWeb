@@ -13,8 +13,8 @@ class GameViewModel {
     private val _gameState = MutableStateFlow(
         GameState(
             currentRoom = gameRooms.getValue("starting_room"),
-            equippedWeapon = InventoryData.getCurrentWeapon(),
-            currentAvatar = AvatarData.getCurrentAvatar()
+            equippedWeapon = Weapons.FISTS,
+            currentAvatar = Avatars.NEUTRAL
         )
     )
 

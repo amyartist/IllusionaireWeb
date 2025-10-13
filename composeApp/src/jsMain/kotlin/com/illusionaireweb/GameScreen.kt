@@ -51,14 +51,20 @@ fun showGameScreen(containerId: String) {
 
         // Add the image to the game container
         gameContainer.appendChild(roomImage)
+
         // Health Bar
         val healthBar = createHealthBarElement()
         gameContainer.appendChild(healthBar)
+
+        // Avatar Display
+        val avatarDisplay = createAvatarElement()
+        gameContainer.appendChild(avatarDisplay)
 
         // --- State Observation ---
         viewModel.gameState.onEach { state ->
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
+            updateAvatarDisplay(avatarDisplay, state.currentAvatar) // Update the avatar's image
         }.launchIn(scope)
 
 
