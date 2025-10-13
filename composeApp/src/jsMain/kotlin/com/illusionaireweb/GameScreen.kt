@@ -51,8 +51,22 @@ fun showGameScreen(containerId: String) {
         }
         gameContainer.appendChild(roomImage)
 
+        val topStatusContainer = document.createElement("div") as HTMLDivElement
+        with(topStatusContainer.style) {
+            position = "absolute"
+            top = "10px"
+            left = "10px"
+            display = "flex"
+            alignItems = "center"
+            columnGap = "15px"
+        }
+        gameContainer.appendChild(topStatusContainer) // Add the new container to the game area
+
         val healthBar = createHealthBarElement()
-        gameContainer.appendChild(healthBar)
+        topStatusContainer.appendChild(healthBar)
+
+        val weaponIcon = createEquippedWeaponIconElement()
+        topStatusContainer.appendChild(weaponIcon)
 
         val avatarDisplay = createAvatarElement()
         gameContainer.appendChild(avatarDisplay)
@@ -69,6 +83,7 @@ fun showGameScreen(containerId: String) {
         viewModel.gameState.onEach { state ->
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
+            updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
             updateAvatarDisplay(avatarDisplay, state.currentAvatar) // Update the avatar's image
             updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
                 viewModel.onPlayerAction(actionId)

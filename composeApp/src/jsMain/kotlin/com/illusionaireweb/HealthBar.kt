@@ -13,15 +13,16 @@ fun createHealthBarElement(): HTMLDivElement {
     // 1. Create the outer container (the gold border)
     val healthBarContainer = document.createElement("div") as HTMLDivElement
     with(healthBarContainer.style) {
-        position = "absolute"
-        top = "10px"
-        left = "10px"
+//        position = "absolute"
+//        top = "10px"
+//        left = "10px"
         width = "200px"
         height = "25px"
         border = "2px solid ${GameColors.BORDER_YELLOW}"
         backgroundColor = GameColors.HEALTH_BAR_BACKGROUND
         borderRadius = "5px"
         boxSizing = "border-box"
+        display = "block"
     }
 
     // 2. Create the inner bar (the green fill)
