@@ -54,14 +54,39 @@ class GameViewModel {
     }
 
     private fun handleOpenAction(action: Action) {
-        console.log("Executing OPEN action: ${action.id}")
-        // Future logic: check inventory, maybe trigger a monster, give an item.
-        _gameState.update { it.copy(currentAvatar = action.avatar ?: it.currentAvatar) }
-    }
+        _gameState.update { currentState ->
+            if (action.id in currentState.lootedActionIds) {
+                return@update currentState.copy(
+                    dialogMessage = "You search the ${action.item} again, but it's empty.",
+                    currentAvatar = Avatars.NEUTRAL
+                )
+            }
+
+            val foundItems = action.contents
+            if (foundItems.isNullOrEmpty()) {
+                val newLootedIds = currentState.lootedActionIds + action.id
+                return@update currentState.copy(
+                    dialogMessage = action.message ?: "You open the ${action.item} and find nothing.",
+                    currentAvatar = action.avatar ?: currentState.currentAvatar,
+                    lootedActionIds = newLootedIds
+                )
+            }
+
+            val weaponToEquip = foundItems.filterIsInstance<Weapon>().firstOrNull()
+            val itemNames = foundItems.joinToString(", ") { it.name }
+            val dialogMessage = "You open the ${action.item} and find: $itemNames."
+            val newLootedIds = currentState.lootedActionIds + action.id
+
+            currentState.copy(
+                dialogMessage = dialogMessage,
+                equippedWeapon = weaponToEquip ?: currentState.equippedWeapon,
+                currentAvatar = action.avatar ?: currentState.currentAvatar,
+                lootedActionIds = newLootedIds
+            )
+        }    }
 
     private fun handleGoAction(action: Action) {
         console.log("Executing GO action: ${action.id}")
-        // Future logic: move the player to a new room.
         val destinationId = action.destinationRoomId
         if (destinationId != null) {
             moveToRoom(destinationId)
