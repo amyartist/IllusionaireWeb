@@ -102,21 +102,6 @@ class GameViewModel {
         }
     }
 
-    private fun hideCurrentMonster() {
-        _gameState.update { currentState ->
-            val monsterActionIdToRemove = currentState.currentRoom.actions.find {
-                it.id in currentState.revealedMonsterActionIds && it.monster != null
-            }?.id
-
-            if (monsterActionIdToRemove != null) {
-                val newRevealedIds = currentState.revealedMonsterActionIds - monsterActionIdToRemove
-                currentState.copy(revealedMonsterActionIds = newRevealedIds)
-            } else {
-                currentState
-            }
-        }
-    }
-
     fun onFightMonster() {
         console.log("Player chose to FIGHT!")
         _gameState.update { currentState ->
@@ -134,17 +119,37 @@ class GameViewModel {
             val damageTaken = (monster.strength - weapon.strength).coerceAtLeast(0)
             val newHealth = (currentState.playerHealth - damageTaken).coerceAtLeast(0)
             val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
+            val newLootedIds = currentState.lootedActionIds + monsterAction.id
+
             currentState.copy(
                 playerHealth = newHealth,
-                revealedMonsterActionIds = newRevealedIds
+                revealedMonsterActionIds = newRevealedIds,
+                lootedActionIds = newLootedIds
             )
         }
-        hideCurrentMonster()
     }
 
     fun onAppeaseMonster() {
         console.log("Player chose to APPEASE!")
-        hideCurrentMonster()
+        _gameState.update { currentState ->
+            val monsterAction = currentState.currentRoom.actions.find {
+                it.id in currentState.revealedMonsterActionIds && it.monster != null
+            }
+
+            if (monsterAction?.monster == null) {
+                console.error("onAppeaseMonster called, but no active monster was found.")
+                return@update currentState
+            }
+
+            val monster = monsterAction.monster
+            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
+            val newLootedIds = currentState.lootedActionIds + monsterAction.id
+
+            currentState.copy(
+                revealedMonsterActionIds = newRevealedIds,
+                lootedActionIds = newLootedIds
+            )
+        }
     }
 
     fun dismissDialog() {
