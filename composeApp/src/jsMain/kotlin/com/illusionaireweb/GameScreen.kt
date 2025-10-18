@@ -92,6 +92,15 @@ fun showGameScreen(containerId: String) {
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
             updateAvatarDisplay(avatarDisplay, state.currentAvatar)
             updateDialog(dialog, state.dialogMessage)
+            if (state.riddleToDisplay != null) {
+                showRiddleDialog(
+                    question = state.riddleToDisplay,
+                    onSubmit = { userAnswer -> viewModel.submitRiddleAnswer(userAnswer) },
+                    onDismiss = { viewModel.dismissRiddle() }
+                )
+            } else {
+                hideRiddleDialog()
+            }
             val isMonsterVisible = state.currentRoom.actions.any {
                 it.id in state.revealedMonsterActionIds && it.monster != null
             }

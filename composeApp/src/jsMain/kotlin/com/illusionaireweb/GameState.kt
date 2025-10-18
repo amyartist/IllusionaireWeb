@@ -7,5 +7,10 @@ data class GameState(
     val playerHealth: Int = 100,
     val dialogMessage: String? = null,
     val lootedActionIds: Set<String> = emptySet(),
-    val revealedMonsterActionIds: Set<String> = emptySet()
+    val revealedMonsterActionIds: Set<String> = emptySet(),
+    val isRiddleLoading: Boolean = false,
+    val isCheckingRiddleAnswer: Boolean = false,
+    val riddleQuestion: String? = null,
+    val monsterActionIdToAppease: String? = null,
+    val riddleToDisplay: String? = null
 )

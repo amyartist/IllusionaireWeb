@@ -60,14 +60,16 @@ class AiService {
         return generateContent(prompt) ?: "The creature seems unable to think of a riddle. Something is wrong."
     }
 
-    suspend fun checkRiddleAnswer(userAnswer: String): Boolean {
+    suspend fun checkRiddleAnswer(riddle: String, userAnswer: String): Boolean {
+        // This new prompt gives the AI the necessary context to make a correct judgment.
         val prompt = """
-            My answer to your riddle is "$userAnswer".
-            Is this answer correct? Answer only with the word "yes" or "no".
+            The riddle was: "$riddle"
+            My answer is: "$userAnswer"
+            Is my answer correct for the riddle provided? Please answer only with the single word "yes" or "no".
         """.trimIndent()
 
         val responseText = generateContent(prompt)?.trim()?.lowercase() ?: "no"
         console.log("Gemini's answer validation: '$responseText'")
+        // Using .contains("yes") is a bit safer than a direct equals check
         return responseText.contains("yes")
-    }
-}
+    }}

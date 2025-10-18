@@ -1,14 +1,24 @@
 package com.illusionaireweb
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * Manages the game's state and business logic.
  * It is completely separate from the UI (DOM manipulation).
  */
 class GameViewModel {
+    private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val aiService = AiService()
+
+    // We store the riddle question internally to check the answer
+    private var activeRiddleQuestion: String? = null
+
     // A private mutable state that holds the current game state.
     private val _gameState = MutableStateFlow(
         GameState(
@@ -129,25 +139,100 @@ class GameViewModel {
         }
     }
 
+//    fun onAppeaseMonster() {
+//        console.log("Player chose to APPEASE!")
+//        _gameState.update { currentState ->
+//            val monsterAction = currentState.currentRoom.actions.find {
+//                it.id in currentState.revealedMonsterActionIds && it.monster != null
+//            }
+//
+//            if (monsterAction?.monster == null) {
+//                console.error("onAppeaseMonster called, but no active monster was found.")
+//                return@update currentState
+//            }
+//
+//            val monster = monsterAction.monster
+//            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
+//            val newLootedIds = currentState.lootedActionIds + monsterAction.id
+//
+//            currentState.copy(
+//                revealedMonsterActionIds = newRevealedIds,
+//                lootedActionIds = newLootedIds
+//            )
+//        }
+//    }
+
     fun onAppeaseMonster() {
         console.log("Player chose to APPEASE!")
+        // 1. Set a loading message in the simple dialog via the state.
+        _gameState.update { it.copy(dialogMessage = "The monster is pondering a riddle...") }
+
+        viewModelScope.launch {
+            val riddleText = aiService.getRiddle()
+            if (riddleText != null) {
+                // 2. Success: Clear simple dialog message and set the riddle question in the state.
+                _gameState.update { it.copy(dialogMessage = null, riddleToDisplay = riddleText) }
+            } else {
+                // 3. Failure: Show an error in the simple dialog.
+                _gameState.update { it.copy(dialogMessage = "The spirits are silent. The monster is not in the mood for riddles.") }
+            }
+        }    }
+
+    fun submitRiddleAnswer(userAnswer: String) {
+        val riddleQuestion = _gameState.value.riddleToDisplay ?: return
+
+        // 1. Update state: hide riddle, show "checking" message, and set loading flag.
+        _gameState.update {
+            it.copy(
+                riddleToDisplay = null, // This will signal the UI to hide the riddle dialog
+                isCheckingRiddleAnswer = true,
+                dialogMessage = "The monster considers your answer..."
+            )
+        }
+
+        viewModelScope.launch {
+            val isCorrect = aiService.checkRiddleAnswer(riddleQuestion, userAnswer)
+            handleRiddleResult(isCorrect)
+        }
+    }
+
+    private fun handleRiddleResult(isCorrect: Boolean) {
         _gameState.update { currentState ->
-            val monsterAction = currentState.currentRoom.actions.find {
-                it.id in currentState.revealedMonsterActionIds && it.monster != null
+            // Find the monster action to update its state (looted/revealed)
+            val monsterActionId = currentState.revealedMonsterActionIds.find { id ->
+                currentState.currentRoom.actions.any { it.id == id && it.monster != null }
+            }!!
+            val monsterName = currentState.currentRoom.actions
+                .find { it.id == monsterActionId }?.monster?.description ?: "creature"
+
+            val resultMessage: String
+            val newState: GameState
+
+            if (isCorrect) {
+                resultMessage = "Correct! The $monsterName is pleased and lets you pass."
+                newState = currentState.copy(
+                    lootedActionIds = currentState.lootedActionIds + monsterActionId,
+                    revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterActionId
+                )
+            } else {
+                val damage = 15
+                resultMessage = "Wrong! The $monsterName gets angry and strikes you for $damage damage!"
+                newState = currentState.copy(
+                    playerHealth = (currentState.playerHealth - damage).coerceAtLeast(0)
+                )
             }
 
-            if (monsterAction?.monster == null) {
-                console.error("onAppeaseMonster called, but no active monster was found.")
-                return@update currentState
-            }
+            // Final update: clear loading flag and set the result message
+            newState.copy(isCheckingRiddleAnswer = false, dialogMessage = resultMessage)
+        }
+    }
 
-            val monster = monsterAction.monster
-            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
-            val newLootedIds = currentState.lootedActionIds + monsterAction.id
-
-            currentState.copy(
-                revealedMonsterActionIds = newRevealedIds,
-                lootedActionIds = newLootedIds
+    fun dismissRiddle() {
+        // Just update the state. The UI will react and hide the dialog.
+        _gameState.update {
+            it.copy(
+                riddleToDisplay = null,
+                dialogMessage = "You decide not to test your wits right now."
             )
         }
     }
