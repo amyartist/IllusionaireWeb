@@ -77,6 +77,9 @@ fun showGameScreen(containerId: String) {
         )
         gameContainer.appendChild(monsterDisplay)
 
+        val bloodSplatter = createBloodSplatterElement()
+        monsterDisplay.appendChild(bloodSplatter)
+
         val buttonsContainer = createButtonsContainer()
         gameContainer.appendChild(buttonsContainer)
 
@@ -84,6 +87,8 @@ fun showGameScreen(containerId: String) {
             viewModel.dismissDialog()
         }
         gameContainer.appendChild(dialog)
+
+        var lastSeenFightKey: Long? = null
 
         // --- State Observation ---
         viewModel.gameState.onEach { state ->
@@ -104,7 +109,11 @@ fun showGameScreen(containerId: String) {
             val isMonsterVisible = state.currentRoom.actions.any {
                 it.id in state.revealedMonsterActionIds && it.monster != null
             }
-            updateMonsterDisplay(monsterDisplay, state.currentRoom, state.revealedMonsterActionIds)
+            updateMonsterDisplay(
+                monsterDisplay,
+                state.currentRoom,
+                state.revealedMonsterActionIds,
+                state.monsterDefeatAnimationIds)
             if (isMonsterVisible) {
                 buttonsContainer.style.display = "none"
             } else {
@@ -112,6 +121,12 @@ fun showGameScreen(containerId: String) {
             }
             updateGameButtons(buttonsContainer, state.currentRoom.actions) { actionId ->
                 viewModel.onPlayerAction(actionId)
+            }
+            if (state.fightEffectKey != null && state.fightEffectKey != lastSeenFightKey) {
+                // If it's a new fight, trigger the visual effect.
+                showBloodSplatterEffect(bloodSplatter)
+                // Update the tracker so we don't trigger it again for the same fight.
+                lastSeenFightKey = state.fightEffectKey
             }
         }.launchIn(scope)
 

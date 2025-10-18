@@ -12,5 +12,7 @@ data class GameState(
     val isCheckingRiddleAnswer: Boolean = false,
     val riddleQuestion: String? = null,
     val monsterActionIdToAppease: String? = null,
-    val riddleToDisplay: String? = null
+    val riddleToDisplay: String? = null,
+    val fightEffectKey: Long? = null,
+    val monsterDefeatAnimationIds: Set<String> = emptySet()
 )

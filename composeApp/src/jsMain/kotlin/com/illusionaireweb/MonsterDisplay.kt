@@ -25,14 +25,12 @@ fun createMonsterDisplayElement(
         top = "50%"
         left = "50%"
         transform = "translate(-50%, -50%)"
-        backgroundColor = "transparent" // The container itself is invisible
+        backgroundColor = "transparent"
         width = "300px"
-
         display = "flex"
         flexDirection = "column"
         alignItems = "center"
-        columnGap = "15px" // Add some space between the image and the buttons
-
+        columnGap = "15px"
         display = "none"
         zIndex = "10"
     }
@@ -105,13 +103,15 @@ fun createMonsterDisplayElement(
 fun updateMonsterDisplay(
     monsterContainer: HTMLDivElement,
     currentRoom: Room,
-    revealedMonsterActionIds: Set<String>
+    revealedMonsterActionIds: Set<String>,
+    defeatAnimationIds: Set<String>
 ) {
     val monsterAction = currentRoom.actions.find {
         it.id in revealedMonsterActionIds && it.monster != null
     }
 
     val monsterImage = monsterContainer.querySelector("#monster-image") as? HTMLImageElement
+    val buttonContainer = monsterContainer.querySelector("div > div") as? HTMLDivElement // More robust selector for button container
 
     if (monsterAction != null && monsterImage != null) {
         val monster = monsterAction.monster!!
@@ -120,6 +120,14 @@ fun updateMonsterDisplay(
             monsterImage.title = monster.description
         }
         monsterContainer.style.display = "flex"
+        val isAnimatingDefeat = monsterAction.id in defeatAnimationIds
+
+        // Only show the buttons if the monster is NOT animating its defeat.
+        if (isAnimatingDefeat) {
+            buttonContainer?.style?.display = "none"
+        } else {
+            buttonContainer?.style?.display = "flex"
+        }
     } else {
         monsterContainer.style.display = "none"
     }

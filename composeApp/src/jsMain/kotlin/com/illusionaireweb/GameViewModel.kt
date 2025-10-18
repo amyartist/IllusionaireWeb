@@ -3,6 +3,7 @@ package com.illusionaireweb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -114,53 +115,42 @@ class GameViewModel {
 
     fun onFightMonster() {
         console.log("Player chose to FIGHT!")
+        val monsterAction = _gameState.value.currentRoom.actions.find {
+            it.id in _gameState.value.revealedMonsterActionIds && it.monster != null
+        } ?: return // Exit if no monster found
+
+        // --- PART 1: IMMEDIATE STATE UPDATE (Trigger Animation) ---
         _gameState.update { currentState ->
-            val monsterAction = currentState.currentRoom.actions.find {
-                it.id in currentState.revealedMonsterActionIds && it.monster != null
-            }
-
-            if (monsterAction?.monster == null) {
-                console.error("onFightMonster called, but no active monster was found in the state.")
-                return@update currentState
-            }
-
-            val monster = monsterAction.monster
+            val monster = monsterAction.monster!!
             val weapon = currentState.equippedWeapon
             val damageTaken = (monster.strength - weapon.strength).coerceAtLeast(0)
             val newHealth = (currentState.playerHealth - damageTaken).coerceAtLeast(0)
-            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
-            val newLootedIds = currentState.lootedActionIds + monsterAction.id
 
             currentState.copy(
                 playerHealth = newHealth,
-                revealedMonsterActionIds = newRevealedIds,
-                lootedActionIds = newLootedIds
+                // Trigger the blood splatter effect in the UI
+                fightEffectKey = js("Date.now()").unsafeCast<Double>().toLong(),
+                // Add the monster to the "animating" set. It remains in `revealedMonsterActionIds` for now.
+                monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds + monsterAction.id
             )
         }
-    }
 
-//    fun onAppeaseMonster() {
-//        console.log("Player chose to APPEASE!")
-//        _gameState.update { currentState ->
-//            val monsterAction = currentState.currentRoom.actions.find {
-//                it.id in currentState.revealedMonsterActionIds && it.monster != null
-//            }
-//
-//            if (monsterAction?.monster == null) {
-//                console.error("onAppeaseMonster called, but no active monster was found.")
-//                return@update currentState
-//            }
-//
-//            val monster = monsterAction.monster
-//            val newRevealedIds = currentState.revealedMonsterActionIds - monsterAction.id
-//            val newLootedIds = currentState.lootedActionIds + monsterAction.id
-//
-//            currentState.copy(
-//                revealedMonsterActionIds = newRevealedIds,
-//                lootedActionIds = newLootedIds
-//            )
-//        }
-//    }
+        // --- PART 2: DELAYED STATE UPDATE (Remove Monster After Animation) ---
+        viewModelScope.launch {
+            // Wait for the animation to finish (1.5 seconds)
+            delay(1500L)
+
+            _gameState.update { currentState ->
+                currentState.copy(
+                    // Now, officially remove the monster from view
+                    revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterAction.id,
+                    // Mark its action as completed
+                    lootedActionIds = currentState.lootedActionIds + monsterAction.id,
+                    // Clean up the animation state
+                    monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds - monsterAction.id
+                )
+            }
+        }    }
 
     fun onAppeaseMonster() {
         console.log("Player chose to APPEASE!")
@@ -204,7 +194,6 @@ class GameViewModel {
 
     private fun handleRiddleResult(isCorrect: Boolean) {
         _gameState.update { currentState ->
-            // Find the monster action to update its state (looted/revealed)
             val monsterActionId = currentState.revealedMonsterActionIds.find { id ->
                 currentState.currentRoom.actions.any { it.id == id && it.monster != null }
             }!!
@@ -255,13 +244,6 @@ class GameViewModel {
             }
         } else {
             console.error("GameViewModel: Room with ID '$roomId' not found.")
-        }
-    }
-
-    fun takeDamage(amount: Int) {
-        _gameState.update { currentState ->
-            val newHealth = currentState.playerHealth - amount
-            currentState.copy(playerHealth = newHealth)
         }
     }
 }
