@@ -55,9 +55,18 @@ class AiService {
         }
     }
 
-    suspend fun getRiddle(): String? {
-        val prompt = "Ask me a riddle. Do not show me the answer, let me give you the answer."
-        return generateContent(prompt) ?: "The creature seems unable to think of a riddle. Something is wrong."
+    suspend fun getRiddle(theme: String): String? {
+        // Create a new, dynamic prompt using the theme.
+        // We also add instructions for brevity and tone.
+        val prompt = """
+            Ask me a challenging but fair riddle.
+            The riddle's theme should be related to a "$theme".
+            The riddle should be no more than three sentences long.
+            Do not reveal the answer.
+        """.trimIndent()
+
+        console.log("New riddle prompt sent to AI: $prompt") // Good for debugging
+        return generateContent(prompt)
     }
 
     suspend fun checkRiddleAnswer(riddle: String, userAnswer: String): Boolean {

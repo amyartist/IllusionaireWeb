@@ -164,16 +164,22 @@ class GameViewModel {
 
     fun onAppeaseMonster() {
         console.log("Player chose to APPEASE!")
-        // 1. Set a loading message in the simple dialog via the state.
-        _gameState.update { it.copy(dialogMessage = "The monster is pondering a riddle...") }
+        val monsterAction = _gameState.value.currentRoom.actions.find {
+            it.monster != null && it.id in _gameState.value.revealedMonsterActionIds
+        }
 
+        if (monsterAction?.monster == null) {
+            console.error("onAppeaseMonster called, but no active monster was found.")
+            return
+        }
+        val monsterName = monsterAction.monster.description
+
+        _gameState.update { it.copy(dialogMessage = "The monster is pondering a riddle...") }
         viewModelScope.launch {
-            val riddleText = aiService.getRiddle()
+            val riddleText = aiService.getRiddle(monsterName)
             if (riddleText != null) {
-                // 2. Success: Clear simple dialog message and set the riddle question in the state.
                 _gameState.update { it.copy(dialogMessage = null, riddleToDisplay = riddleText) }
             } else {
-                // 3. Failure: Show an error in the simple dialog.
                 _gameState.update { it.copy(dialogMessage = "The spirits are silent. The monster is not in the mood for riddles.") }
             }
         }    }
