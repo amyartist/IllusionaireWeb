@@ -149,7 +149,7 @@ class GameViewModel {
                 }
             }
         }
-        
+
         // --- PART 2: DELAYED STATE UPDATE (Remove Monster After Animation) ---
         viewModelScope.launch {
             // Wait for the animation to finish (1.5 seconds)
