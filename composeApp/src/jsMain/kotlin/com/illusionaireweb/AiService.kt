@@ -9,18 +9,16 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-// Data classes to match the Gemini REST API JSON structure
+// Data classes to match the backend's API
+// Note: RiddleRequest is no longer needed for the frontend.
 @Serializable
-data class GeminiRequest(val contents: List<Content>)
-@Serializable
-data class Content(val parts: List<Part>)
-@Serializable
-data class Part(val text: String)
+data class RiddleResponse(val riddle: String)
 
 @Serializable
-data class GeminiResponse(val candidates: List<Candidate>)
+data class CheckAnswerRequest(val riddle: String, val userAnswer: String)
+
 @Serializable
-data class Candidate(val content: Content)
+data class CheckAnswerResponse(val correct: Boolean)
 
 
 class AiService {
@@ -28,55 +26,45 @@ class AiService {
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
-                ignoreUnknownKeys = true // The API returns more fields than we need
+                ignoreUnknownKeys = true
             })
         }
     }
 
-    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$GEMINI_API_KEY"
+    // The backend service is running locally
+    private val backendUrl = "http://localhost:8080"
 
-    private suspend fun generateContent(prompt: String): String? {
+    suspend fun getRiddle(theme: String): String? {
+        console.log("Requesting riddle with theme '$theme' from backend service.")
         return try {
-            val requestBody = GeminiRequest(
-                contents = listOf(Content(parts = listOf(Part(text = prompt))))
-            )
-
-            val response: GeminiResponse = httpClient.post(endpoint) {
-                contentType(ContentType.Application.Json)
-                setBody(requestBody)
+            // **CHANGED**: Make a GET request to the /riddle endpoint,
+            // passing the theme as a URL query parameter.
+            val response: RiddleResponse = httpClient.get("$backendUrl/riddle") {
+                url {
+                    parameters.append("theme", theme)
+                }
             }.body()
 
-            response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
+            response.riddle
         } catch (e: Exception) {
-            console.error("Error calling Gemini REST API: ${e.message}")
-            null
+            console.error("Error calling backend service for a riddle: ${e.message}")
+            "Sorry, I couldn't think of a riddle right now. Please try again."
         }
     }
 
-    suspend fun getRiddle(theme: String): String? {
-        // Create a new, dynamic prompt using the theme.
-        // We also add instructions for brevity and tone.
-        val prompt = """
-            Ask me a challenging but fair riddle.
-            The riddle's theme should be related to a "$theme".
-            The riddle should be no more than three sentences long.
-            Do not reveal the answer.
-        """.trimIndent()
-
-        console.log("New riddle prompt sent to AI: $prompt") // Good for debugging
-        return generateContent(prompt)
-    }
-
     suspend fun checkRiddleAnswer(riddle: String, userAnswer: String): Boolean {
-        // This new prompt gives the AI the necessary context to make a correct judgment.
-        val prompt = """
-            The riddle was: "$riddle"
-            My answer is: "$userAnswer"
-            Is my answer correct for the riddle provided? Please answer only with the single word "yes" or "no".
-        """.trimIndent()
+        console.log("Sending answer to backend for verification.")
+        return try {
+            // This remains a POST request, as we are sending data to be evaluated.
+            val response: CheckAnswerResponse = httpClient.post("$backendUrl/check-answer") {
+                contentType(ContentType.Application.Json)
+                setBody(CheckAnswerRequest(riddle = riddle, userAnswer = userAnswer))
+            }.body()
 
-        val responseText = generateContent(prompt)?.trim()?.lowercase() ?: "no"
-        console.log("Gemini's answer validation: '$responseText'")
-        // Using .contains("yes") is a bit safer than a direct equals check
-        return responseText.contains("yes")
-    }}
+            response.correct
+        } catch (e: Exception) {
+            console.error("Error calling backend service to check an answer: ${e.message}")
+            false
+        }
+    }
+}
