@@ -128,13 +128,28 @@ class GameViewModel {
 
             currentState.copy(
                 playerHealth = newHealth,
-                // Trigger the blood splatter effect in the UI
                 fightEffectKey = js("Date.now()").unsafeCast<Double>().toLong(),
-                // Add the monster to the "animating" set. It remains in `revealedMonsterActionIds` for now.
-                monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds + monsterAction.id
+                monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds + monsterAction.id,
+                currentAvatar = Avatars.HURT
             )
         }
 
+        viewModelScope.launch {
+            // Wait for the 1.2-second shake animation to finish.
+            delay(1200L)
+
+            // After the delay, change the avatar back to NEUTRAL.
+            _gameState.update { currentState ->
+                // Only revert if the current avatar is still HURT, to avoid race conditions
+                // if another event changed the avatar in the meantime.
+                if (currentState.currentAvatar.type == AvatarType.HURT) {
+                    currentState.copy(currentAvatar = Avatars.NEUTRAL)
+                } else {
+                    currentState
+                }
+            }
+        }
+        
         // --- PART 2: DELAYED STATE UPDATE (Remove Monster After Animation) ---
         viewModelScope.launch {
             // Wait for the animation to finish (1.5 seconds)

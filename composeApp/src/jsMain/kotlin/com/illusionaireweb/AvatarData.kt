@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 enum class AvatarType {
-    HAPPY, SAD, SURPRISED, NEUTRAL
+    HAPPY, HURT, SURPRISED, NEUTRAL
 }
 
 class Avatar(
@@ -22,9 +22,9 @@ object Avatars {
         type = AvatarType.HAPPY,
         avatarPath = "images/avatar_happy.png"
     )
-    val SAD = Avatar(
-        type = AvatarType.SAD,
-        avatarPath = "images/avatar_sad.png"
+    val HURT = Avatar(
+        type = AvatarType.HURT,
+        avatarPath = "images/avatar_hurt.png"
     )
     val NEUTRAL = Avatar(
         type = AvatarType.NEUTRAL   ,
