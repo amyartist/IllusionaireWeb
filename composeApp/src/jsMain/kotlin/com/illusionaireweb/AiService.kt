@@ -32,7 +32,8 @@ class AiService {
     }
 
     // The backend service is running locally
-    private val backendUrl = "http://localhost:8080"
+    //private val backendUrl = "http://localhost:8080"
+    private val backendUrl = "http://34.173.109.129:8080"
 
     suspend fun getRiddle(theme: String): String? {
         console.log("Requesting riddle with theme '$theme' from backend service.")
