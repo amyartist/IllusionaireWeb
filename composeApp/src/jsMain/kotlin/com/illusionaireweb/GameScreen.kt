@@ -127,6 +127,7 @@ fun showGameScreen(containerId: String) {
             }
             if (state.fightEffectKey != null && state.fightEffectKey != lastSeenFightKey) {
                 showBloodSplatterEffect(bloodSplatter)
+                triggerAvatarShake(avatarDisplay)
                 lastSeenFightKey = state.fightEffectKey
             }
         }.launchIn(scope)
