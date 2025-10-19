@@ -31,6 +31,8 @@ fun showGameScreen(containerId: String) {
 
         // Main Game Container
         val gameContainer = document.createElement("div") as HTMLDivElement
+        gameContainer.id = "game-container"
+
         with(gameContainer.style) {
             position = "relative"
             maxWidth = "1024px"
@@ -60,7 +62,7 @@ fun showGameScreen(containerId: String) {
             alignItems = "center"
             columnGap = "15px"
         }
-        gameContainer.appendChild(topStatusContainer) // Add the new container to the game area
+        gameContainer.appendChild(topStatusContainer)
 
         val healthBar = createHealthBarElement()
         topStatusContainer.appendChild(healthBar)
@@ -88,6 +90,12 @@ fun showGameScreen(containerId: String) {
         }
         gameContainer.appendChild(dialog)
 
+        val riddleDialog = createRiddleDialog(
+            onSubmit = { userAnswer -> viewModel.submitRiddleAnswer(userAnswer) },
+            onDismiss = { viewModel.dismissRiddle() }
+        )
+        gameContainer.appendChild(riddleDialog)
+
         var lastSeenFightKey: Long? = null
 
         // --- State Observation ---
@@ -97,15 +105,6 @@ fun showGameScreen(containerId: String) {
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
             updateAvatarDisplay(avatarDisplay, state.currentAvatar)
             updateDialog(dialog, state.dialogMessage)
-            if (state.riddleToDisplay != null) {
-                showRiddleDialog(
-                    question = state.riddleToDisplay,
-                    onSubmit = { userAnswer -> viewModel.submitRiddleAnswer(userAnswer) },
-                    onDismiss = { viewModel.dismissRiddle() }
-                )
-            } else {
-                hideRiddleDialog()
-            }
             val isMonsterVisible = state.currentRoom.actions.any {
                 it.id in state.revealedMonsterActionIds && it.monster != null
             }
@@ -114,6 +113,10 @@ fun showGameScreen(containerId: String) {
                 state.currentRoom,
                 state.revealedMonsterActionIds,
                 state.monsterDefeatAnimationIds)
+
+            updateDialog(dialog, state.dialogMessage)
+            updateRiddleDialog(riddleDialog, state.riddleToDisplay)
+
             if (isMonsterVisible) {
                 buttonsContainer.style.display = "none"
             } else {
@@ -123,13 +126,10 @@ fun showGameScreen(containerId: String) {
                 viewModel.onPlayerAction(actionId)
             }
             if (state.fightEffectKey != null && state.fightEffectKey != lastSeenFightKey) {
-                // If it's a new fight, trigger the visual effect.
                 showBloodSplatterEffect(bloodSplatter)
-                // Update the tracker so we don't trigger it again for the same fight.
                 lastSeenFightKey = state.fightEffectKey
             }
         }.launchIn(scope)
-
 
         hostContainer.innerHTML = ""
         hostContainer.appendChild(gameContainer)

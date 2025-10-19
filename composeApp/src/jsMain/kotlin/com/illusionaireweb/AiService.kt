@@ -1,5 +1,3 @@
-// In composeApp/src/jsMain/kotlin/com/illusionaireweb/AiService.kt
-
 package com.illusionaireweb
 
 import io.ktor.client.*

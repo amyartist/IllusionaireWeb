@@ -165,14 +165,23 @@ class GameViewModel {
         val monsterName = monsterAction.monster.description
 
         _gameState.update { it.copy(dialogMessage = "The monster is pondering a riddle...") }
+
         viewModelScope.launch {
             val riddleText = aiService.getRiddle(monsterName)
             if (riddleText != null) {
-                _gameState.update { it.copy(dialogMessage = null, riddleToDisplay = riddleText) }
+                // Revert to a single, clean state update.
+                // The UI layer will now be responsible for handling this transition correctly.
+                _gameState.update {
+                    it.copy(
+                        dialogMessage = null,
+                        riddleToDisplay = riddleText
+                    )
+                }
             } else {
                 _gameState.update { it.copy(dialogMessage = "The spirits are silent. The monster is not in the mood for riddles.") }
             }
-        }    }
+        }
+    }
 
     fun submitRiddleAnswer(userAnswer: String) {
         val riddleQuestion = _gameState.value.riddleToDisplay ?: return
