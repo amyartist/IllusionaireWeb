@@ -77,6 +77,7 @@ fun updateGameButtons(container: HTMLDivElement, actions: List<Action>, onAction
 
         // Add the click listener
         button.onclick = {
+            SoundManager.play("select")
             onActionClick(action.id)
         }
 

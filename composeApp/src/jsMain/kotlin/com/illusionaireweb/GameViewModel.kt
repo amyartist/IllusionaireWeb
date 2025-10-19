@@ -56,6 +56,7 @@ class GameViewModel {
 
     private fun handleLookAction(action: Action) {
         console.log("Executing LOOK action: ${action.id}")
+        SoundManager.play("hm")
         _gameState.update {
             it.copy(
                 dialogMessage = action.message,
@@ -65,6 +66,7 @@ class GameViewModel {
     }
 
     private fun handleOpenAction(action: Action) {
+        SoundManager.play("creak")
         _gameState.update { currentState ->
             if (action.id in currentState.lootedActionIds) {
                 return@update currentState.copy(
@@ -74,6 +76,7 @@ class GameViewModel {
             }
 
             if (action.monster != null) {
+                SoundManager.play("scary")
                 val newRevealedIds = currentState.revealedMonsterActionIds + action.id
                 return@update currentState.copy(
                     dialogMessage = action.message,
@@ -84,6 +87,7 @@ class GameViewModel {
 
             val foundItems = action.contents
             if (foundItems.isNullOrEmpty()) {
+                SoundManager.play("magic")
                 val newLootedIds = currentState.lootedActionIds + action.id
                 return@update currentState.copy(
                     dialogMessage = action.message ?: "You open the ${action.item} and find nothing.",
@@ -109,6 +113,7 @@ class GameViewModel {
         console.log("Executing GO action: ${action.id}")
         val destinationId = action.destinationRoomId
         if (destinationId != null) {
+            SoundManager.play("footsteps")
             moveToRoom(destinationId)
         }
     }

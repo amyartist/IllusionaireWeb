@@ -71,13 +71,19 @@ fun createMonsterDisplayElement(
     val fightButton = (document.createElement("button") as HTMLButtonElement).apply {
         textContent = "Fight!"
         buttonStyle()
-        onclick = { onFightClick() }
+        onclick = {
+            SoundManager.play("select")
+            onFightClick()
+        }
     }
 
     val appeaseButton = (document.createElement("button") as HTMLButtonElement).apply {
         textContent = "Appease"
         buttonStyle()
-        onclick = { onAppeaseClick() }
+        onclick = {
+            SoundManager.play("select")
+            onAppeaseClick()
+        }
     }
 
     // Assemble the parts
@@ -111,7 +117,7 @@ fun updateMonsterDisplay(
     }
 
     val monsterImage = monsterContainer.querySelector("#monster-image") as? HTMLImageElement
-    val buttonContainer = monsterContainer.querySelector("div > div") as? HTMLDivElement // More robust selector for button container
+    val buttonContainer = monsterContainer.querySelector("div > div") as? HTMLDivElement
 
     if (monsterAction != null && monsterImage != null) {
         val monster = monsterAction.monster!!

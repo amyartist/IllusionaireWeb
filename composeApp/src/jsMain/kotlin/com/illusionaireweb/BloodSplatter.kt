@@ -39,6 +39,7 @@ fun createBloodSplatterElement(): HTMLImageElement {
  * Triggers the blood splatter effect.
  */
 fun showBloodSplatterEffect(splatterImage: HTMLImageElement) {
+    SoundManager.play("monster_hit")
     splatterImage.style.display = "block"
     // Apply the shake animation. The duration (0.8s) is less than the total display time (1.2s).
     splatterImage.style.animation = "shake-from-center 0.8s cubic-bezier(.36,.07,.19,.97)"

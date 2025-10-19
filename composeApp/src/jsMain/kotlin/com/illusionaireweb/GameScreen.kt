@@ -6,9 +6,64 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLImageElement
+
+/**
+ * Creates the initial "Start Game" screen overlay.
+ * This screen is shown first to get the necessary user interaction to enable audio.
+ * @param onStartClick A lambda function to be executed when the start button is clicked.
+ */
+private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
+    val overlay = document.createElement("div") as HTMLDivElement
+    with(overlay.style) {
+        position = "absolute"
+        top = "0"
+        left = "0"
+        width = "100%"
+        height = "100%"
+        backgroundColor = "rgba(0, 0, 0, 0.95)"
+        display = "flex"
+        flexDirection = "column"
+        justifyContent = "center"
+        alignItems = "center"
+        zIndex = "1000" // Ensure it's on top of other game elements
+        columnGap = "20px"
+        // Match the parent container's border radius for a seamless look
+        borderRadius = "8px"
+    }
+
+    val title = document.createElement("h1") as HTMLElement
+    title.textContent = "Illusionaire"
+    with(title.style) {
+        color = GameColors.DIALOG_TEXT
+        fontFamily = "'MedievalSharp', cursive"
+        fontSize = "5rem"
+        textShadow = "2px 2px 8px ${GameColors.BORDER_YELLOW}"
+    }
+
+    val startButton = document.createElement("button") as HTMLButtonElement
+    startButton.textContent = "Click to Begin"
+    with(startButton.style) {
+        backgroundColor = GameColors.BACKGROUND_BLACK
+        color = GameColors.DIALOG_TEXT
+        border = "2px solid ${GameColors.BORDER_YELLOW}"
+        padding = "15px 30px"
+        fontSize = "1.5rem"
+        fontFamily = "'MedievalSharp', cursive"
+        cursor = "pointer"
+        borderRadius = "5px"
+    }
+    // Assign the click action provided to the function
+    startButton.onclick = { onStartClick() }
+
+    overlay.appendChild(title)
+    overlay.appendChild(startButton)
+
+    return overlay
+}
 
 fun showGameScreen(containerId: String) {
     val hostContainer = document.getElementById(containerId) as? HTMLElement
@@ -25,15 +80,14 @@ fun showGameScreen(containerId: String) {
         // --- STEP 1: PRELOAD ASSETS ---
         hostContainer.textContent = "Loading assets..." // Show a loading message
         try {
-            // Add all sounds you want to preload to this list.
-            SoundManager.preloadSounds(listOf("select"))
+            SoundManager.preloadSounds(listOf("select", "creak", "footsteps", "hm", "magic", "scary", "hurt", "background_music", "monster_hit"))
         } catch (e: Error) {
             hostContainer.textContent = "Error loading assets. Please refresh the page."
             console.error("Failed to preload sounds:", e)
             return@launch
         }
 
-        // --- STEP 2: BUILD UI (only after sounds are loaded) ---
+        // --- STEP 2: BUILD UI ---
         hostContainer.innerHTML = "" // Clear the "Loading..." message
 
         hostContainer.style.display = "flex"
@@ -42,22 +96,23 @@ fun showGameScreen(containerId: String) {
         hostContainer.style.width = "100%"
         hostContainer.style.height = "100%"
 
-        // All UI element creation now happens inside this coroutine.
+        // Create the game container. It will be VISIBLE from the start.
         val gameContainer = document.createElement("div") as HTMLDivElement
         gameContainer.id = "game-container"
 
         with(gameContainer.style) {
-            position = "relative"
+            position = "relative" // Crucial for positioning the child start screen
             maxWidth = "1024px"
             width = "min(100%, 100vw, 90vh)"
             border = "2px solid ${GameColors.BORDER_YELLOW}"
             backgroundColor = GameColors.BACKGROUND_BLACK
             borderRadius = "10px"
-            display = "flex"
+            display = "flex" // The container is now visible
             alignItems = "center"
             justifyContent = "center"
         }
 
+        // --- Create all game elements and add them to the game container ---
         val roomImage = document.createElement("img") as HTMLImageElement
         with(roomImage.style) {
             width = "100%"
@@ -108,10 +163,25 @@ fun showGameScreen(containerId: String) {
         gameContainer.appendChild(riddleDialog)
 
         var lastSeenFightKey: Long? = null
+        lateinit var startScreen: HTMLDivElement
 
-        // --- STEP 3: START GAME LOGIC OBSERVER ---
+        // --- STEP 3: CREATE THE START SCREEN ---
+        startScreen = createStartScreen {
+            // This code runs when the "Click to Begin" button is clicked.
+            console.log("User interaction detected. Starting music.")
+
+            // 1. Start the background music
+            SoundManager.playLoop("background_music")
+
+            // 2. Hide the start screen to reveal the game underneath
+            startScreen.style.display = "none"
+        }
+        // Add the start screen as a child of the game container
+        gameContainer.appendChild(startScreen)
+
+        // --- STEP 4: START GAME LOGIC OBSERVER ---
         viewModel.gameState.onEach { state ->
-            // The UI update logic here remains completely unchanged.
+            // UI update logic remains unchanged
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
@@ -144,6 +214,7 @@ fun showGameScreen(containerId: String) {
             }
         }.launchIn(scope)
 
+        // Finally, add the fully assembled game container to the page
         hostContainer.appendChild(gameContainer)
     }
 }

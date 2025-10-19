@@ -10,6 +10,7 @@ import kotlin.js.Promise
  */
 object SoundManager {
     private val soundCache = mutableMapOf<String, Audio>()
+    private var currentMusic: Audio? = null
 
     /**
      * Preloads a list of sound files so they are ready for instant playback.
@@ -63,5 +64,46 @@ object SoundManager {
         } catch (e: dynamic) {
             console.error("Error playing sound '$soundName':", e)
         }
+    }
+
+    fun playLoop(soundName: String) {
+        // If this music is already playing, do nothing.
+        if (currentMusic?.src?.contains("$soundName.wav") == true) {
+            return
+        }
+
+        // Stop any music that is currently playing before starting the new one.
+        stopLoop()
+
+        val music = soundCache[soundName]
+        if (music == null) {
+            console.error("Music '$soundName' not preloaded. Cannot play.")
+            return
+        }
+
+        try {
+            music.loop = true
+            // --- THIS IS THE CHANGE ---
+            // The play() function returns a Promise. We handle its rejection.
+            music.play().catch { error ->
+                console.warn(
+                    "Could not play background music due to browser policy. " +
+                            "Waiting for user interaction. Error: ", error
+                )
+            }
+            currentMusic = music // Keep track of the current music
+        } catch (e: dynamic) {
+            console.error("Error playing looping music '$soundName':", e)
+        }
+    }
+    /**
+     * Stops the currently playing background music.
+     */
+    fun stopLoop() {
+        currentMusic?.let {
+            it.pause()
+            it.currentTime = 0.0
+        }
+        currentMusic = null
     }
 }
