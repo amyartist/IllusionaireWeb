@@ -11,6 +11,7 @@ fun main() {
     document.addEventListener("DOMContentLoaded", {
         // The ID of the div on the host website where the game will be embedded.
         val gameContainerId = "illusionaire-web-container"
+        console.log("Kotlin main function has started.")
 
         showGameScreen(gameContainerId)
     })

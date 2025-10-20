@@ -65,6 +65,8 @@ private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
     return overlay
 }
 
+@OptIn(ExperimentalJsExport::class)
+@JsExport
 fun showGameScreen(containerId: String) {
     val hostContainer = document.getElementById(containerId) as? HTMLElement
     if (hostContainer == null) {

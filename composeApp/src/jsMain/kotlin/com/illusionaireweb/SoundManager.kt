@@ -26,17 +26,20 @@ object SoundManager {
             }
 
             Promise { resolve, reject ->
-                // If the audio is already loaded enough, resolve immediately.
-                if (audio.readyState >= 4) { // HAVE_ENOUGH_DATA
+                if (audio.readyState >= 4) {
+                    console.log("Sound '$soundName' was already cached and loaded.")
                     resolve(Unit)
                     return@Promise
                 }
 
                 audio.oncanplaythrough = {
+                    console.log("Successfully preloaded sound: '$soundName.wav'")
                     resolve(Unit)
                 }
 
                 audio.onerror = { _, _, _, _, _ ->
+                    val errorMessage = "Failed to load sound: '$soundName.wav'. Check if the file exists in 'resources/sounds' and the name is correct."
+                    console.error(errorMessage)
                     reject(Error("Failed to load sound: $soundName"))
                 }
             }
