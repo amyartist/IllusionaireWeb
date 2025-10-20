@@ -69,6 +69,7 @@ fun createMonsterDisplayElement(
     }
 
     val fightButton = (document.createElement("button") as HTMLButtonElement).apply {
+        id = "fight-button" // Add ID for potential future use
         textContent = "Fight!"
         buttonStyle()
         onclick = {
@@ -78,6 +79,7 @@ fun createMonsterDisplayElement(
     }
 
     val appeaseButton = (document.createElement("button") as HTMLButtonElement).apply {
+        id = "appease-button" // Add ID to select this button specifically
         textContent = "Appease"
         buttonStyle()
         onclick = {
@@ -98,19 +100,20 @@ fun createMonsterDisplayElement(
 
 /**
  * Updates the visibility and image of the monster display.
- *
- * It finds the first monster associated with a revealed action in the current room
- * and displays it. If no revealed monsters are in the room, it hides the container.
+ * Also handles enabling/disabling the appease button.
  *
  * @param monsterContainer The UI element for the monster display.
  * @param currentRoom The player's current room.
- * @param revealedMonsterActionIds The set of action IDs that have revealed a monster.
+ * @param revealedMonsterActionIds Set of action IDs that have revealed a monster.
+ * @param defeatAnimationIds Set of action IDs for monsters in their defeat animation.
+ * @param failedAppeaseActionIds Set of action IDs where an appease attempt has failed.
  */
 fun updateMonsterDisplay(
     monsterContainer: HTMLDivElement,
     currentRoom: Room,
     revealedMonsterActionIds: Set<String>,
-    defeatAnimationIds: Set<String>
+    defeatAnimationIds: Set<String>,
+    failedAppeaseActionIds: Set<String>
 ) {
     val monsterAction = currentRoom.actions.find {
         it.id in revealedMonsterActionIds && it.monster != null
@@ -118,6 +121,7 @@ fun updateMonsterDisplay(
 
     val monsterImage = monsterContainer.querySelector("#monster-image") as? HTMLImageElement
     val buttonContainer = monsterContainer.querySelector("div > div") as? HTMLDivElement
+    val appeaseButton = monsterContainer.querySelector("#appease-button") as? HTMLButtonElement
 
     if (monsterAction != null && monsterImage != null) {
         val monster = monsterAction.monster!!
@@ -133,6 +137,20 @@ fun updateMonsterDisplay(
             buttonContainer?.style?.display = "none"
         } else {
             buttonContainer?.style?.display = "flex"
+
+            // Logic to disable the appease button after one failed attempt
+            appeaseButton?.let { button ->
+                val hasFailedAppease = monsterAction.id in failedAppeaseActionIds
+                button.disabled = hasFailedAppease
+
+                if (hasFailedAppease) {
+                    button.style.opacity = "0.5"
+                    button.style.cursor = "not-allowed"
+                } else {
+                    button.style.opacity = "1.0"
+                    button.style.cursor = "pointer"
+                }
+            }
         }
     } else {
         monsterContainer.style.display = "none"

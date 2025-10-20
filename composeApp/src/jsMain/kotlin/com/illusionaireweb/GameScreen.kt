@@ -107,7 +107,7 @@ fun showGameScreen(containerId: String) {
             border = "2px solid ${GameColors.BORDER_YELLOW}"
             backgroundColor = GameColors.BACKGROUND_BLACK
             borderRadius = "10px"
-            display = "flex" // The container is now visible
+            display = "flex"
             alignItems = "center"
             justifyContent = "center"
         }
@@ -190,7 +190,8 @@ fun showGameScreen(containerId: String) {
                 monsterDisplay,
                 state.currentRoom,
                 state.revealedMonsterActionIds,
-                state.monsterDefeatAnimationIds
+                state.monsterDefeatAnimationIds,
+                state.failedAppeaseActionIds
             )
             updateDialog(dialog, state.dialogMessage)
             updateRiddleDialog(riddleDialog, state.riddleToDisplay)

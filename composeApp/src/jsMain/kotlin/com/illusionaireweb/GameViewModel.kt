@@ -236,7 +236,8 @@ class GameViewModel {
                 resultMessage = "Wrong! The $monsterName gets angry and strikes you for $damage damage!"
                 newState = currentState.copy(
                     playerHealth = (currentState.playerHealth - damage).coerceAtLeast(0),
-                    currentAvatar = Avatars.HURT
+                    currentAvatar = Avatars.HURT,
+                    failedAppeaseActionIds = currentState.failedAppeaseActionIds + monsterActionId
                 )
             }
 

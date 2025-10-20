@@ -14,5 +14,6 @@ data class GameState(
     val monsterActionIdToAppease: String? = null,
     val riddleToDisplay: String? = null,
     val fightEffectKey: Long? = null,
-    val monsterDefeatAnimationIds: Set<String> = emptySet()
+    val monsterDefeatAnimationIds: Set<String> = emptySet(),
+    val failedAppeaseActionIds: Set<String> = emptySet()
 )
