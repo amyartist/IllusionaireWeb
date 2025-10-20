@@ -155,18 +155,13 @@ class GameViewModel {
             }
         }
 
-        // --- PART 2: DELAYED STATE UPDATE (Remove Monster After Animation) ---
         viewModelScope.launch {
-            // Wait for the animation to finish (1.5 seconds)
             delay(1500L)
 
             _gameState.update { currentState ->
                 currentState.copy(
-                    // Now, officially remove the monster from view
                     revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterAction.id,
-                    // Mark its action as completed
                     lootedActionIds = currentState.lootedActionIds + monsterAction.id,
-                    // Clean up the animation state
                     monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds - monsterAction.id
                 )
             }
@@ -189,8 +184,6 @@ class GameViewModel {
         viewModelScope.launch {
             val riddleText = aiService.getRiddle(monsterName)
             if (riddleText != null) {
-                // Revert to a single, clean state update.
-                // The UI layer will now be responsible for handling this transition correctly.
                 _gameState.update {
                     it.copy(
                         dialogMessage = null,
@@ -206,10 +199,9 @@ class GameViewModel {
     fun submitRiddleAnswer(userAnswer: String) {
         val riddleQuestion = _gameState.value.riddleToDisplay ?: return
 
-        // 1. Update state: hide riddle, show "checking" message, and set loading flag.
         _gameState.update {
             it.copy(
-                riddleToDisplay = null, // This will signal the UI to hide the riddle dialog
+                riddleToDisplay = null,
                 isCheckingRiddleAnswer = true,
                 dialogMessage = "The monster considers your answer..."
             )
@@ -236,13 +228,15 @@ class GameViewModel {
                 resultMessage = "Correct! The $monsterName is pleased and lets you pass."
                 newState = currentState.copy(
                     lootedActionIds = currentState.lootedActionIds + monsterActionId,
-                    revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterActionId
+                    revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterActionId,
+                    currentAvatar = Avatars.HAPPY
                 )
             } else {
                 val damage = 15
                 resultMessage = "Wrong! The $monsterName gets angry and strikes you for $damage damage!"
                 newState = currentState.copy(
-                    playerHealth = (currentState.playerHealth - damage).coerceAtLeast(0)
+                    playerHealth = (currentState.playerHealth - damage).coerceAtLeast(0),
+                    currentAvatar = Avatars.HURT
                 )
             }
 
@@ -256,7 +250,8 @@ class GameViewModel {
         _gameState.update {
             it.copy(
                 riddleToDisplay = null,
-                dialogMessage = "You decide not to test your wits right now."
+                dialogMessage = "You decide not to test your wits right now.",
+                currentAvatar = Avatars.NEUTRAL
             )
         }
     }
