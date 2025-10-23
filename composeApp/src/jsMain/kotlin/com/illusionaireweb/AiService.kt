@@ -29,7 +29,7 @@ class AiService {
         }
     }
 
-    private val backendUrl = "http://34.173.109.129:8080"
+    private val backendUrl = "https://cartoonminiboss.com"
 
     suspend fun getRiddle(theme: String): String? {
         console.log("Requesting riddle with theme '$theme' from backend service.")
