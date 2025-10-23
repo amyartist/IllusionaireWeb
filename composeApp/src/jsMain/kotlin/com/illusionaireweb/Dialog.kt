@@ -3,17 +3,7 @@ package com.illusionaireweb
 import kotlinx.browser.document
 import org.w3c.dom.*
 
-
-// --- Simple "OK" Dialog (Unchanged) ---
-
-/**
- * Creates the full simple dialog element, including the overlay. It's hidden by default.
- * This should be called only ONCE during UI setup.
- * @param onOkClick A lambda function that will be executed when the "OK" button is clicked.
- * @return The top-level overlay element for the dialog.
- */
 fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
-    // 1. Create the overlay (the semi-transparent background)
     val overlay = document.createElement("div") as HTMLDivElement
     overlay.id = "dialog-overlay"
     with(overlay.style) {
@@ -30,7 +20,6 @@ fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
         display = "none" // Start hidden
     }
 
-    // 2. Create the dialog box itself
     val dialogBox = document.createElement("div") as HTMLDivElement
     with(dialogBox.style) {
         backgroundColor = GameColors.DIALOG_BACKGROUND
@@ -41,7 +30,6 @@ fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
         textAlign = "center"
     }
 
-    // 3. Create the message paragraph
     val messageText = document.createElement("p") as HTMLParagraphElement
     messageText.id = "dialog-message" // ID to easily update the text
     with(messageText.style) {
@@ -51,7 +39,6 @@ fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
         marginBottom = "20px"
     }
 
-    // 4. Create the "OK" button
     val okButton = document.createElement("button") as HTMLButtonElement
     okButton.textContent = "OK"
     with(okButton.style) {
@@ -72,7 +59,6 @@ fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
         onOkClick()
     }
 
-    // 5. Assemble the parts
     dialogBox.appendChild(messageText)
     dialogBox.appendChild(okButton)
     overlay.appendChild(dialogBox)
@@ -80,11 +66,6 @@ fun createDialogElement(onOkClick: () -> Unit): HTMLDivElement {
     return overlay
 }
 
-/**
- * Updates the simple dialog's visibility and message.
- * @param overlay The dialog element created by `createDialogElement`.
- * @param message The message to display. If null, the dialog is hidden.
- */
 fun updateDialog(overlay: HTMLDivElement, message: String?) {
     if (message != null) {
         val messageText = overlay.querySelector("#dialog-message") as? HTMLParagraphElement
@@ -95,19 +76,7 @@ fun updateDialog(overlay: HTMLDivElement, message: String?) {
     }
 }
 
-
-// --- Riddle Dialog (Refactored to Create/Update Pattern) ---
-
-/**
- * Creates the entire riddle dialog structure, hidden by default.
- * This should be called only ONCE during UI setup.
- *
- * @param onSubmit A lambda that will be called with the user's answer.
- * @param onDismiss A lambda that will be called if the user gives up.
- * @return The main HTMLDivElement for the riddle overlay.
- */
 fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLDivElement {
-    // 1. Create the overlay
     val overlay = document.createElement("div") as HTMLDivElement
     overlay.id = "riddle-dialog-overlay"
     with(overlay.style) {
@@ -121,7 +90,6 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         display = "none" // Start hidden
     }
 
-    // 2. Create the dialog box
     val dialogBox = document.createElement("div") as HTMLDivElement
     with(dialogBox.style) {
         backgroundColor = GameColors.DIALOG_BACKGROUND
@@ -135,16 +103,14 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         columnGap = "15px"
     }
 
-    // 3. Create the riddle question text
     val questionText = document.createElement("p") as HTMLParagraphElement
-    questionText.id = "riddle-question-text" // ID to update the text
+    questionText.id = "riddle-question-text"
     with(questionText.style) {
         color = GameColors.DIALOG_TEXT
         fontSize = "18px"
         lineHeight = "1.5"
     }
 
-    // 4. Create the text input for the answer
     val answerInput = document.createElement("input") as HTMLInputElement
     answerInput.type = "text"
     answerInput.id = "riddle-answer-input"
@@ -153,10 +119,9 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         width = "90%"
         padding = "10px"
         fontSize = "16px"
-        margin = "0 auto" // Center the input
+        margin = "0 auto"
     }
 
-    // 5. Create a container for the buttons
     val buttonContainer = document.createElement("div") as HTMLDivElement
     with(buttonContainer.style) {
         display = "flex"
@@ -165,7 +130,6 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         marginTop = "10px"
     }
 
-    // 6. Create the "Submit" button
     val submitButton = document.createElement("button") as HTMLButtonElement
     submitButton.textContent = "Answer"
     with(submitButton.style) {
@@ -182,7 +146,6 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         }
     }
 
-    // 7. Create the "Give Up" button
     val giveUpButton = document.createElement("button") as HTMLButtonElement
     giveUpButton.textContent = "Give Up"
     with(giveUpButton.style) {
@@ -196,7 +159,6 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
         onDismiss()
     }
 
-    // 8. Assemble the dialog
     buttonContainer.appendChild(giveUpButton)
     buttonContainer.appendChild(submitButton)
     dialogBox.appendChild(questionText)
@@ -207,21 +169,16 @@ fun createRiddleDialog(onSubmit: (String) -> Unit, onDismiss: () -> Unit): HTMLD
     return overlay
 }
 
-/**
- * Updates the riddle dialog's visibility and content.
- * @param riddleOverlay The element created by `createRiddleDialog`.
- * @param question The riddle text to display. If null, the dialog is hidden.
- */
 fun updateRiddleDialog(riddleOverlay: HTMLDivElement, question: String?) {
     if (question != null) {
         val questionText = riddleOverlay.querySelector("#riddle-question-text") as? HTMLParagraphElement
         val answerInput = riddleOverlay.querySelector("#riddle-answer-input") as? HTMLInputElement
 
         questionText?.textContent = question
-        answerInput?.value = "" // Clear previous answer
+        answerInput?.value = ""
 
         riddleOverlay.style.display = "flex"
-        answerInput?.focus() // Automatically focus the input for the user
+        answerInput?.focus()
     } else {
         riddleOverlay.style.display = "none"
     }

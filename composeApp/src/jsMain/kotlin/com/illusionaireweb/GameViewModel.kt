@@ -9,10 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * Manages the game's state and business logic.
- * It is completely separate from the UI (DOM manipulation).
- */
 class GameViewModel {
     private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val aiService = AiService()
@@ -28,12 +24,7 @@ class GameViewModel {
     val gameState = _gameState.asStateFlow()
 
 
-    /**
-     * Main entry point for all player actions from buttons.
-     * It finds the action by its ID and delegates to the appropriate handler.
-     */
     fun onPlayerAction(actionId: String) {
-        // Find the room and the specific action that was clicked
         val currentRoom = _gameState.value.currentRoom
         val action = currentRoom.actions.find { it.id == actionId }
 
@@ -42,7 +33,6 @@ class GameViewModel {
             return
         }
 
-        // Delegate to the correct function based on the action type
         when (action.type) {
             ActionType.LOOK -> handleLookAction(action)
             ActionType.OPEN -> handleOpenAction(action)
@@ -118,7 +108,7 @@ class GameViewModel {
         console.log("Player chose to FIGHT!")
         val monsterAction = _gameState.value.currentRoom.actions.find {
             it.id in _gameState.value.revealedMonsterActionIds && it.monster != null
-        } ?: return // Exit if no monster found
+        } ?: return
 
         _gameState.update { currentState ->
             val monster = monsterAction.monster!!
@@ -236,7 +226,6 @@ class GameViewModel {
     }
 
     fun dismissRiddle() {
-        // Just update the state. The UI will react and hide the dialog.
         _gameState.update {
             it.copy(
                 riddleToDisplay = null,

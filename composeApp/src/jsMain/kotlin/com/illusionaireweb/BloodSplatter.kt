@@ -4,15 +4,8 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLImageElement
 
-// The private injectShakeAnimation() function and its const ID are REMOVED from this file.
-
-/**
- * Creates the blood splatter image element and styles it.
- * The element is hidden by default.
- */
 fun createBloodSplatterElement(): HTMLImageElement {
-    // Ensure the shared CSS animation rule is available in the document.
-    injectCenteredShakeAnimation() // <-- This now calls our new shared function
+    injectCenteredShakeAnimation()
 
     val splatterImage = document.createElement("img") as HTMLImageElement
     splatterImage.src = "images/blood_splatter.png"
@@ -29,7 +22,7 @@ fun createBloodSplatterElement(): HTMLImageElement {
         opacity = "0.8"
         zIndex = "20"
         setProperty("pointer-events", "none")
-        display = "none" // Start hidden
+        display = "none"
     }
 
     return splatterImage
@@ -41,7 +34,6 @@ fun createBloodSplatterElement(): HTMLImageElement {
 fun showBloodSplatterEffect(splatterImage: HTMLImageElement) {
     SoundManager.play("monster_hit")
     splatterImage.style.display = "block"
-    // Apply the shake animation. The duration (0.8s) is less than the total display time (1.2s).
     splatterImage.style.animation = "shake-from-center 0.8s cubic-bezier(.36,.07,.19,.97)"
 
     window.setTimeout({

@@ -6,13 +6,6 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLImageElement
 import kotlin.text.endsWith
 
-/**
- * Creates the container element for displaying a monster, now with action buttons.
- *
- * @param onFightClick Lambda to execute when the "Fight!" button is clicked.
- * @param onAppeaseClick Lambda to execute when the "Appease" button is clicked.
- * @return A HTMLDivElement that will hold the monster image and buttons.
- */
 fun createMonsterDisplayElement(
     onFightClick: () -> Unit,
     onAppeaseClick: () -> Unit
@@ -35,7 +28,6 @@ fun createMonsterDisplayElement(
         zIndex = "10"
     }
 
-    // Monster Image
     val monsterImage = document.createElement("img") as HTMLImageElement
     monsterImage.id = "monster-image"
     with(monsterImage.style) {
@@ -43,7 +35,6 @@ fun createMonsterDisplayElement(
         height = "auto"
     }
 
-    // Container for the buttons
     val buttonContainer = document.createElement("div") as HTMLDivElement
     with(buttonContainer.style) {
         display = "flex"
@@ -88,7 +79,6 @@ fun createMonsterDisplayElement(
         }
     }
 
-    // Assemble the parts
     buttonContainer.appendChild(fightButton)
     buttonContainer.appendChild(appeaseButton)
 
@@ -98,16 +88,6 @@ fun createMonsterDisplayElement(
     return monsterContainer
 }
 
-/**
- * Updates the visibility and image of the monster display.
- * Also handles enabling/disabling the appease button.
- *
- * @param monsterContainer The UI element for the monster display.
- * @param currentRoom The player's current room.
- * @param revealedMonsterActionIds Set of action IDs that have revealed a monster.
- * @param defeatAnimationIds Set of action IDs for monsters in their defeat animation.
- * @param failedAppeaseActionIds Set of action IDs where an appease attempt has failed.
- */
 fun updateMonsterDisplay(
     monsterContainer: HTMLDivElement,
     currentRoom: Room,
@@ -132,13 +112,10 @@ fun updateMonsterDisplay(
         monsterContainer.style.display = "flex"
         val isAnimatingDefeat = monsterAction.id in defeatAnimationIds
 
-        // Only show the buttons if the monster is NOT animating its defeat.
         if (isAnimatingDefeat) {
             buttonContainer?.style?.display = "none"
         } else {
             buttonContainer?.style?.display = "flex"
-
-            // Logic to disable the appease button after one failed attempt
             appeaseButton?.let { button ->
                 val hasFailedAppease = monsterAction.id in failedAppeaseActionIds
                 button.disabled = hasFailedAppease

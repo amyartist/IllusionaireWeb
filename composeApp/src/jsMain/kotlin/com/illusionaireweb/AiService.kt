@@ -9,8 +9,6 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-// Data classes to match the backend's API
-// Note: RiddleRequest is no longer needed for the frontend.
 @Serializable
 data class RiddleResponse(val riddle: String)
 
@@ -31,15 +29,11 @@ class AiService {
         }
     }
 
-    // The backend service is running locally
-    //private val backendUrl = "http://localhost:8080"
     private val backendUrl = "http://34.173.109.129:8080"
 
     suspend fun getRiddle(theme: String): String? {
         console.log("Requesting riddle with theme '$theme' from backend service.")
         return try {
-            // **CHANGED**: Make a GET request to the /riddle endpoint,
-            // passing the theme as a URL query parameter.
             val response: RiddleResponse = httpClient.get("$backendUrl/riddle") {
                 url {
                     parameters.append("theme", theme)
@@ -56,7 +50,6 @@ class AiService {
     suspend fun checkRiddleAnswer(riddle: String, userAnswer: String): Boolean {
         console.log("Sending answer to backend for verification.")
         return try {
-            // This remains a POST request, as we are sending data to be evaluated.
             val response: CheckAnswerResponse = httpClient.post("$backendUrl/check-answer") {
                 contentType(ContentType.Application.Json)
                 setBody(CheckAnswerRequest(riddle = riddle, userAnswer = userAnswer))

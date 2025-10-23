@@ -4,20 +4,10 @@ import kotlinx.coroutines.await
 import org.w3c.dom.Audio
 import kotlin.js.Promise
 
-/**
- * A singleton object to manage loading, caching, and playing sound effects.
- * Includes a preloading mechanism to ensure instant playback on first use.
- */
 object SoundManager {
     private val soundCache = mutableMapOf<String, Audio>()
     private var currentMusic: Audio? = null
 
-    /**
-     * Preloads a list of sound files so they are ready for instant playback.
-     * This should be called once when the game starts.
-     *
-     * @param soundNames A list of sound file names (e.g., "select") without extensions.
-     */
     suspend fun preloadSounds(soundNames: List<String>) {
         console.log("Preloading sounds: $soundNames")
         val promises = soundNames.map { soundName ->
@@ -49,11 +39,6 @@ object SoundManager {
         console.log("All sounds preloaded successfully!")
     }
 
-    /**
-     * Plays a sound effect from the cache. Assumes the sound has been preloaded.
-     *
-     * @param soundName The base name of the sound file (e.g., "select").
-     */
     fun play(soundName: String) {
         val sound = soundCache[soundName]
         if (sound == null) {
@@ -70,12 +55,10 @@ object SoundManager {
     }
 
     fun playLoop(soundName: String) {
-        // If this music is already playing, do nothing.
         if (currentMusic?.src?.contains("$soundName.wav") == true) {
             return
         }
 
-        // Stop any music that is currently playing before starting the new one.
         stopLoop()
 
         val music = soundCache[soundName]
@@ -86,8 +69,6 @@ object SoundManager {
 
         try {
             music.loop = true
-            // --- THIS IS THE CHANGE ---
-            // The play() function returns a Promise. We handle its rejection.
             music.play().catch { error ->
                 console.warn(
                     "Could not play background music due to browser policy. " +
@@ -99,9 +80,7 @@ object SoundManager {
             console.error("Error playing looping music '$soundName':", e)
         }
     }
-    /**
-     * Stops the currently playing background music.
-     */
+
     fun stopLoop() {
         currentMusic?.let {
             it.pause()

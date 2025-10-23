@@ -11,11 +11,6 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLImageElement
 
-/**
- * Creates the initial "Start Game" screen overlay.
- * This screen is shown first to get the necessary user interaction to enable audio.
- * @param onStartClick A lambda function to be executed when the start button is clicked.
- */
 private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
     val overlay = document.createElement("div") as HTMLDivElement
     with(overlay.style) {
@@ -29,9 +24,8 @@ private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
         flexDirection = "column"
         justifyContent = "center"
         alignItems = "center"
-        zIndex = "1000" // Ensure it's on top of other game elements
+        zIndex = "1000"
         columnGap = "20px"
-        // Match the parent container's border radius for a seamless look
         borderRadius = "8px"
     }
 
@@ -56,7 +50,6 @@ private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
         cursor = "pointer"
         borderRadius = "5px"
     }
-    // Assign the click action provided to the function
     startButton.onclick = { onStartClick() }
 
     overlay.appendChild(title)
@@ -77,10 +70,8 @@ fun showGameScreen(containerId: String) {
     val viewModel = GameViewModel()
     val scope = CoroutineScope(Dispatchers.Main)
 
-    // Launch a coroutine to handle the entire asynchronous setup process.
     scope.launch {
-        // --- STEP 1: PRELOAD ASSETS ---
-        hostContainer.textContent = "Loading assets..." // Show a loading message
+        hostContainer.textContent = "Loading assets..."
         try {
             SoundManager.preloadSounds(listOf("select", "creak", "footsteps", "hm", "magic", "scary", "hurt", "background_music", "monster_hit"))
         } catch (e: Error) {
@@ -89,8 +80,7 @@ fun showGameScreen(containerId: String) {
             return@launch
         }
 
-        // --- STEP 2: BUILD UI ---
-        hostContainer.innerHTML = "" // Clear the "Loading..." message
+        hostContainer.innerHTML = ""
 
         hostContainer.style.display = "flex"
         hostContainer.style.alignItems = "center"
@@ -98,12 +88,11 @@ fun showGameScreen(containerId: String) {
         hostContainer.style.width = "100%"
         hostContainer.style.height = "100%"
 
-        // Create the game container. It will be VISIBLE from the start.
         val gameContainer = document.createElement("div") as HTMLDivElement
         gameContainer.id = "game-container"
 
         with(gameContainer.style) {
-            position = "relative" // Crucial for positioning the child start screen
+            position = "relative"
             maxWidth = "1024px"
             width = "min(100%, 100vw, 90vh)"
             border = "2px solid ${GameColors.BORDER_YELLOW}"
@@ -114,7 +103,6 @@ fun showGameScreen(containerId: String) {
             justifyContent = "center"
         }
 
-        // --- Create all game elements and add them to the game container ---
         val roomImage = document.createElement("img") as HTMLImageElement
         with(roomImage.style) {
             width = "100%"
@@ -167,23 +155,13 @@ fun showGameScreen(containerId: String) {
         var lastSeenFightKey: Long? = null
         lateinit var startScreen: HTMLDivElement
 
-        // --- STEP 3: CREATE THE START SCREEN ---
         startScreen = createStartScreen {
-            // This code runs when the "Click to Begin" button is clicked.
-            console.log("User interaction detected. Starting music.")
-
-            // 1. Start the background music
             SoundManager.playLoop("background_music")
-
-            // 2. Hide the start screen to reveal the game underneath
             startScreen.style.display = "none"
         }
-        // Add the start screen as a child of the game container
         gameContainer.appendChild(startScreen)
 
-        // --- STEP 4: START GAME LOGIC OBSERVER ---
         viewModel.gameState.onEach { state ->
-            // UI update logic remains unchanged
             roomImage.src = state.currentRoom.image
             updateHealthBar(healthBar, state.playerHealth)
             updateEquippedWeaponIcon(weaponIcon, state.equippedWeapon)
@@ -217,7 +195,6 @@ fun showGameScreen(containerId: String) {
             }
         }.launchIn(scope)
 
-        // Finally, add the fully assembled game container to the page
         hostContainer.appendChild(gameContainer)
     }
 }

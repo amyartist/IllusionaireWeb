@@ -8,7 +8,6 @@ import org.w3c.dom.HTMLImageElement
  * Creates the visual avatar image element.
  */
 fun createAvatarElement(): HTMLImageElement {
-    // Ensure the shared CSS animation rule is available for use.
     injectInPlaceShakeAnimation()
 
     val avatarImage = document.createElement("img") as HTMLImageElement
@@ -20,7 +19,6 @@ fun createAvatarElement(): HTMLImageElement {
         right = "10px" // Position to the top right
         width = "200px" // Set a fixed width for the avatar
         height = "auto" // Maintain aspect ratio
-        // Since the PNGs have transparency, no special border or background is needed.
     }
 
     return avatarImage
@@ -41,11 +39,7 @@ fun updateAvatarDisplay(avatarImage: HTMLImageElement, currentAvatar: Avatar) {
  * @param avatarImage The <img> element for the avatar.
  */
 fun triggerAvatarShake(avatarImage: HTMLImageElement) {
-    // Apply the animation.
     avatarImage.style.animation = "shake-in-place 1.2s cubic-bezier(.36,.07,.19,.97)"
-
-    // Set a timer to remove the animation property after it finishes.
-    // This is crucial so the animation can be re-triggered on the next hit.
     window.setTimeout({
         avatarImage.style.animation = ""
     }, 1200)

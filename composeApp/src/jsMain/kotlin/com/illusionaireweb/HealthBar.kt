@@ -4,18 +4,9 @@ import kotlinx.browser.document
 import org.w3c.dom.HTMLDivElement
 import kotlin.math.max
 
-/**
- * Creates the visual health bar element.
- *
- * @return A Div element representing the health bar container.
- */
 fun createHealthBarElement(): HTMLDivElement {
-    // 1. Create the outer container (the gold border)
     val healthBarContainer = document.createElement("div") as HTMLDivElement
     with(healthBarContainer.style) {
-//        position = "absolute"
-//        top = "10px"
-//        left = "10px"
         width = "200px"
         height = "25px"
         border = "2px solid ${GameColors.BORDER_YELLOW}"
@@ -25,7 +16,6 @@ fun createHealthBarElement(): HTMLDivElement {
         display = "block"
     }
 
-    // 2. Create the inner bar (the green fill)
     val healthFill = document.createElement("div") as HTMLDivElement
     healthFill.id = "health-fill"
     with(healthFill.style) {
@@ -36,7 +26,6 @@ fun createHealthBarElement(): HTMLDivElement {
         transition = "width 0.5s ease-in-out"
     }
 
-    // 3. Add the green fill inside the container and return it
     healthBarContainer.appendChild(healthFill)
     return healthBarContainer
 }
