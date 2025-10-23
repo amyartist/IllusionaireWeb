@@ -17,10 +17,6 @@ class GameViewModel {
     private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val aiService = AiService()
 
-    // We store the riddle question internally to check the answer
-    private var activeRiddleQuestion: String? = null
-
-    // A private mutable state that holds the current game state.
     private val _gameState = MutableStateFlow(
         GameState(
             currentRoom = gameRooms.getValue("starting_room"),
@@ -124,7 +120,6 @@ class GameViewModel {
             it.id in _gameState.value.revealedMonsterActionIds && it.monster != null
         } ?: return // Exit if no monster found
 
-        // --- PART 1: IMMEDIATE STATE UPDATE (Trigger Animation) ---
         _gameState.update { currentState ->
             val monster = monsterAction.monster!!
             val weapon = currentState.equippedWeapon
@@ -140,13 +135,8 @@ class GameViewModel {
         }
 
         viewModelScope.launch {
-            // Wait for the 1.2-second shake animation to finish.
             delay(1200L)
-
-            // After the delay, change the avatar back to NEUTRAL.
             _gameState.update { currentState ->
-                // Only revert if the current avatar is still HURT, to avoid race conditions
-                // if another event changed the avatar in the meantime.
                 if (currentState.currentAvatar.type == AvatarType.HURT) {
                     currentState.copy(currentAvatar = Avatars.NEUTRAL)
                 } else {
@@ -241,7 +231,6 @@ class GameViewModel {
                 )
             }
 
-            // Final update: clear loading flag and set the result message
             newState.copy(isCheckingRiddleAnswer = false, dialogMessage = resultMessage)
         }
     }

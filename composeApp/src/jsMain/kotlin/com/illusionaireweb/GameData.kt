@@ -7,10 +7,15 @@ class Monster(
 )
 
 object Monsters {
-    val LIZARD = Monster(
-        description = "Scary lizard monster",
+    val MONSTER1 = Monster(
+        description = "Mace Masher",
         strength = 5,
-        image = "images/lizard_monster.png"
+        image = "images/monster1.png"
+    )
+    val MONSTER2 = Monster(
+        description = "Sire Slasher",
+        strength = 5,
+        image = "images/monster2.png"
     )
 }
 
@@ -86,7 +91,7 @@ val gameRooms = mapOf(
                 id = "hallway_open_painting",
                 type = ActionType.OPEN,
                 item = "painting",
-                monster = Monsters.LIZARD,
+                monster = Monsters.MONSTER1,
                 appeaseMessage = "Monster says: Show me a kitty in a room!",
                 appeasePrompt = "Is this a picture of a room with cat in it? Only answer yes or no.",
                 avatar = Avatars.SURPRISED
@@ -130,7 +135,7 @@ val gameRooms = mapOf(
                 id = "library_open_book",
                 type = ActionType.OPEN,
                 item = "book",
-                monster = Monsters.LIZARD,
+                monster = Monsters.MONSTER2,
                 appeaseMessage = "Monster says: Show me a kitty in a room!",
                 appeasePrompt = "Is this a picture of a room with cat in it? Only answer yes or no.",
                 avatar = Avatars.SURPRISED
