@@ -39,6 +39,7 @@ fun updateAvatarDisplay(avatarImage: HTMLImageElement, currentAvatar: Avatar) {
  * @param avatarImage The <img> element for the avatar.
  */
 fun triggerAvatarShake(avatarImage: HTMLImageElement) {
+    SoundManager.play("hurt")
     avatarImage.style.animation = "shake-in-place 1.2s cubic-bezier(.36,.07,.19,.97)"
     window.setTimeout({
         avatarImage.style.animation = ""
