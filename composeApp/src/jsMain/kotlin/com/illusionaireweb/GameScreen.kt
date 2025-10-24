@@ -61,6 +61,8 @@ private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 fun showGameScreen(containerId: String) {
+    injectGlobalStyles()
+
     val hostContainer = document.getElementById(containerId) as? HTMLElement
     if (hostContainer == null) {
         console.error("IllusionaireWeb Error: Container element with ID '$containerId' was not found.")

@@ -6,6 +6,7 @@ import kotlin.math.max
 
 fun createHealthBarElement(): HTMLDivElement {
     val healthBarContainer = document.createElement("div") as HTMLDivElement
+    healthBarContainer.id = "health-bar-container"
     with(healthBarContainer.style) {
         width = "200px"
         height = "25px"
