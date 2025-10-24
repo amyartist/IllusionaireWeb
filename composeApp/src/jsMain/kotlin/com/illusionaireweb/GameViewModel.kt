@@ -249,4 +249,21 @@ class GameViewModel {
             console.error("GameViewModel: Room with ID '$roomId' not found.")
         }
     }
+
+     fun resetGame() {
+        _gameState.update { GameState(
+            currentRoom = gameRooms.getValue("starting_room"),
+            equippedWeapon = Weapons.FISTS,
+            currentAvatar = Avatars.NEUTRAL,
+            playerHealth = 100,
+            dialogMessage = null,
+            riddleToDisplay = null,
+            isCheckingRiddleAnswer = false,
+            revealedMonsterActionIds = emptySet(),
+            lootedActionIds = emptySet(),
+            monsterDefeatAnimationIds = emptySet(),
+            failedAppeaseActionIds = emptySet(),
+            fightEffectKey = null
+        ) }
+    }
 }

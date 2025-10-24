@@ -58,6 +58,27 @@ private fun createStartScreen(onStartClick: () -> Unit): HTMLDivElement {
     return overlay
 }
 
+private fun createExitButton(onClick: () -> Unit): HTMLButtonElement {
+    val exitButton = document.createElement("button") as HTMLButtonElement
+    with(exitButton.style) {
+        position = "absolute"
+        top = "10px"
+        left = "10px"
+        width = "40px"
+        height = "40px"
+        backgroundImage = "url('images/exit.png')"
+        backgroundSize = "contain"
+        backgroundRepeat = "no-repeat"
+        backgroundColor = "transparent"
+        border = "none"
+        cursor = "pointer"
+        zIndex = "1001"
+        display = "none" // Initially hidden
+    }
+    exitButton.onclick = { onClick() }
+    return exitButton
+}
+
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 fun showGameScreen(containerId: String) {
@@ -117,7 +138,7 @@ fun showGameScreen(containerId: String) {
         with(topStatusContainer.style) {
             position = "absolute"
             top = "10px"
-            left = "10px"
+            left = "60px" // Adjusted to make space for the exit button
             display = "flex"
             alignItems = "center"
             columnGap = "15px"
@@ -156,10 +177,20 @@ fun showGameScreen(containerId: String) {
 
         var lastSeenFightKey: Long? = null
         lateinit var startScreen: HTMLDivElement
+        lateinit var exitButton: HTMLButtonElement
+
+        exitButton = createExitButton {
+            SoundManager.stopLoop()
+            viewModel.resetGame()
+            startScreen.style.display = "flex"
+            exitButton.style.display = "none"
+        }
+        gameContainer.appendChild(exitButton)
 
         startScreen = createStartScreen {
             SoundManager.playLoop("background_music")
             startScreen.style.display = "none"
+            exitButton.style.display = "block"
         }
         gameContainer.appendChild(startScreen)
 
