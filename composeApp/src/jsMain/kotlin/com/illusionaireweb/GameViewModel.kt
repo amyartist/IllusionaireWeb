@@ -120,6 +120,7 @@ class GameViewModel {
                 playerHealth = newHealth,
                 fightEffectKey = js("Date.now()").unsafeCast<Double>().toLong(),
                 monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds + monsterAction.id,
+                revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterAction.id, // Immediate removal
                 currentAvatar = Avatars.HURT
             )
         }
@@ -140,7 +141,6 @@ class GameViewModel {
 
             _gameState.update { currentState ->
                 currentState.copy(
-                    revealedMonsterActionIds = currentState.revealedMonsterActionIds - monsterAction.id,
                     lootedActionIds = currentState.lootedActionIds + monsterAction.id,
                     monsterDefeatAnimationIds = currentState.monsterDefeatAnimationIds - monsterAction.id
                 )

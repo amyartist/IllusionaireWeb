@@ -95,9 +95,13 @@ fun updateMonsterDisplay(
     defeatAnimationIds: Set<String>,
     failedAppeaseActionIds: Set<String>
 ) {
-    val monsterAction = currentRoom.actions.find {
+    val animatingMonsterId = defeatAnimationIds.firstOrNull()
+    val activeMonsterAction = currentRoom.actions.find {
         it.id in revealedMonsterActionIds && it.monster != null
     }
+    val animatingMonsterAction = currentRoom.actions.find { it.id == animatingMonsterId }
+
+    val monsterAction = activeMonsterAction ?: animatingMonsterAction
 
     val monsterImage = monsterContainer.querySelector("#monster-image") as? HTMLImageElement
     val buttonContainer = monsterContainer.querySelector("div > div") as? HTMLDivElement
@@ -131,5 +135,6 @@ fun updateMonsterDisplay(
         }
     } else {
         monsterContainer.style.display = "none"
+        monsterImage?.src = ""
     }
 }
